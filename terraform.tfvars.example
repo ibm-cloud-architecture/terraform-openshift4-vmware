@@ -1,0 +1,101 @@
+vsphere_username = "username"
+vsphere_password = "password"
+vsphere_server   = "9.42.67.251"
+
+vsphere_datacenter           = "dc01"
+vsphere_cluster              = "cluster01"
+vsphere_node_datastore       = "dc01-ocp01"
+vsphere_image_datastore      = "dc01-ocp01"
+vsphere_public_network       = "vDPortGroup"
+vsphere_private_network      = "vdpg-192.168.100"
+vsphere_image_datastore_path = "images"
+
+public_network_gateway = "9.42.67.129"
+public_network_netmask = 25
+public_network_nameservers = [
+  "9.42.106.2",
+  "9.42.106.3"
+]
+private_network_gateway = "192.168.100.1"
+private_network_netmask = 24
+
+
+openshift_cluster_id  = "test43"
+openshift_base_domain = "ncolon.xyz"
+openshift_pull_secret = "~/.pull-secret"
+
+helper = {
+  template       = "helper-template"
+  username       = "templateusername"
+  password       = "templatepassword"
+  cpu            = 4
+  memory         = 16384
+  disk           = 64
+  network_device = "ens192"
+}
+
+helper_public_ip  = "9.42.67.202"
+helper_private_ip = "192.168.100.100"
+
+bootstrap = {
+  cpu    = 4
+  memory = 16384
+  disk   = 128
+}
+bootstrap_hostname = "bootstrap"
+bootstrap_ip       = "192.168.100.101"
+
+master = {
+  count  = 3
+  cpu    = 4
+  memory = 16384
+  disk   = 128
+}
+
+master_hostnames = [
+  "master01",
+  "master02",
+  "master03"
+]
+
+master_ips = [
+  "192.168.100.102",
+  "192.168.100.103",
+  "192.168.100.104",
+]
+
+worker = {
+  count  = 2
+  cpu    = 4
+  memory = 16384
+  disk   = 128
+}
+
+worker_hostnames = [
+  "worker01",
+  "worker02",
+]
+
+worker_ips = [
+  "192.168.100.105",
+  "192.168.100.106",
+]
+
+storage = {
+  count  = 3
+  cpu    = 8
+  memory = 32768
+  disk   = 128
+}
+
+storage_hostnames = [
+  "storage01",
+  "storage02",
+  "storage03",
+]
+
+storage_ips = [
+  "192.168.100.108",
+  "192.168.100.109",
+  "192.168.100.110",
+]
