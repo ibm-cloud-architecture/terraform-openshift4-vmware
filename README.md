@@ -10,9 +10,6 @@ Deploy OpenShift 4.3 and later using static IP addresses for master and worker n
       - *.apps.cluster_id.domain.com
     - Point both of those DNS A or CNAME records to the public IP address of the helper vm.
 
-2. [Loadbalancers](https://docs.openshift.com/container-platform/4.3/installing/installing_vsphere/installing-vsphere.html#installation-network-user-infra_installing-vsphere) need to be configured ahead of time
-3. An existing webserver that can serve files to the OpenShift nodes for ignition.
-
 ## Installation Process
 
 ```bash
