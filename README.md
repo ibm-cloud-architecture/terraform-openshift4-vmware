@@ -1,10 +1,15 @@
-# govc-openshift4-vmware
+# terraform-openshift4-vmware
 
-Deploy OpenShift 4.3 and later using static IP addresses for master and worker nodes.  It will upload the OpenShift Bare Metal BIOS file and ignition files to a websever, and will create a bootable ISO for each node with static IP configuration and ignition parameters already set.
+Deploy OpenShift 4.3 and later using static IP addresses for master and worker nodes.  Will create a helper node with a webserver to serve ignition files, haproxy for loadbalancing, and DNS for internal cluster name resolution.  It will upload the OpenShift Bare Metal BIOS file and ignition files to the websever root, and will create a bootable ISO for each node with static IP configuration and ignition parameters already set.
 
 ## Prereqs
 
 1. [DNS](https://docs.openshift.com/container-platform/4.3/installing/installing_vsphere/installing-vsphere.html#installation-dns-user-infra_installing-vsphere) needs to be configured ahead of time
+    - If you're using the helper vm for internal DNS, the only external DNS entries required are:
+      - api.cluster_id.domain.com
+      - *.apps.cluster_id.domain.com
+    - Point both of those DNS A or CNAME records to the public IP address of the helper vm.
+
 2. [Loadbalancers](https://docs.openshift.com/container-platform/4.3/installing/installing_vsphere/installing-vsphere.html#installation-network-user-infra_installing-vsphere) need to be configured ahead of time
 3. An existing webserver that can serve files to the OpenShift nodes for ignition.
 
