@@ -33,6 +33,23 @@ resource "vsphere_virtual_machine" "vm" {
     datastore_id = var.image_datastore_id
     path         = "${var.image_datastore_path}/${var.cluster_id}-bootstrap-1.iso"
   }
+
+  connection {
+    host        = self.default_ip_address
+    user        = "core"
+    private_key = var.ssh_private_key
+
+    bastion_host        = var.helper_public_ip
+    bastion_user        = var.helper["username"]
+    bastion_password    = var.helper["password"]
+    bastion_private_key = var.ssh_private_key
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "sudo eject cdrom",
+    ]
+  }
 }
 
 

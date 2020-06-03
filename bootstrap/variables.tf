@@ -34,3 +34,15 @@ variable "cluster_id" {
 variable "network_id" {
   type = string
 }
+
+variable "helper" {
+  type = map(string)
+}
+
+variable "helper_public_ip" {
+  type = string
+}
+
+variable "ssh_private_key" {
+  type = string
+}

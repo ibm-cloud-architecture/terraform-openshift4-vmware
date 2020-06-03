@@ -236,3 +236,31 @@ variable "use_helper_for_node_dns" {
   type    = bool
   default = true
 }
+
+
+
+## SSL Certificates
+variable "apps_certificate" {
+  type    = string
+  default = null
+}
+
+variable "apps_certificate_key" {
+  type    = string
+  default = null
+}
+
+variable "api_certificate" {
+  type    = string
+  default = null
+}
+
+variable "api_certificate_key" {
+  type    = string
+  default = null
+}
+
+variable "custom_ca_bundle" {
+  type    = string
+  default = null
+}

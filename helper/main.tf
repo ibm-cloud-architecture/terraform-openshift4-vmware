@@ -105,6 +105,15 @@ EOF
 }
 
 resource "null_resource" "configure" {
+  triggers = {
+    master_hostnames  = join(",", var.master_hostnames)
+    master_ips        = join(",", var.master_ips)
+    worker_hostnames  = join(",", var.worker_hostnames)
+    worker_ips        = join(",", var.worker_ips)
+    storage_hostnames = join(",", var.storage_hostnames)
+    storage_ips       = join(",", var.storage_ips)
+  }
+
   depends_on = [
     vsphere_virtual_machine.helper
   ]

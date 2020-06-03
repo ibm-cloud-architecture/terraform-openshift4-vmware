@@ -14,6 +14,12 @@ locals {
     data.template_file.worker_type.*.rendered,
     data.template_file.storage_type.*.rendered,
   )
+  all_ignition = concat(
+    data.template_file.bootstrap_ignition.*.rendered,
+    data.template_file.master_ignition.*.rendered,
+    data.template_file.worker_ignition.*.rendered,
+    data.template_file.storage_ignition.*.rendered,
+  )
   all_index = concat(
     data.template_file.bootstrap_index.*.rendered,
     data.template_file.master_index.*.rendered,
@@ -39,6 +45,26 @@ data "template_file" "worker_type" {
 
 data "template_file" "storage_type" {
   count    = var.storage["count"]
+  template = "storage"
+}
+
+data "template_file" "bootstrap_ignition" {
+  count    = 1
+  template = "bootstrap"
+}
+
+data "template_file" "master_ignition" {
+  count    = var.master["count"]
+  template = "master"
+}
+
+data "template_file" "worker_ignition" {
+  count    = var.worker["count"]
+  template = "worker"
+}
+
+data "template_file" "storage_ignition" {
+  count    = var.storage["count"]
   template = "worker"
 }
 
@@ -59,7 +85,7 @@ data "template_file" "worker_index" {
 
 data "template_file" "storage_index" {
   count    = var.storage["count"]
-  template = count.index + 1 + var.worker["count"]
+  template = count.index + 1
 }
 
 
@@ -95,6 +121,8 @@ locals {
 }
 
 resource "null_resource" "generateisos" {
+  count = local.all_count
+
   triggers = {
     master_hostnames  = join(",", var.master_hostnames)
     master_ips        = join(",", var.master_ips)
@@ -102,9 +130,8 @@ resource "null_resource" "generateisos" {
     worker_ips        = join(",", var.worker_ips)
     storage_hostnames = join(",", var.storage_hostnames)
     storage_ips       = join(",", var.storage_ips)
-
   }
-  count = local.all_count
+
   depends_on = [
     null_resource.downloadiso
   ]
@@ -119,7 +146,7 @@ resource "null_resource" "generateisos" {
   provisioner "remote-exec" {
     inline = [
       "cp -Rp /tmp/iso /tmp/${local.all_hostnames[count.index]}",
-      "sed -i 's/coreos.inst=yes/coreos.inst=yes ip=${local.all_ips[count.index]}::${var.private_gateway}:${local.coreos_netmask}:${local.all_hostnames[count.index]}.${var.cluster_id}.${var.base_domain}:${var.network_device}:none ${local.nameservers} coreos.inst.install_dev=sda coreos.inst.image_url=http:\\/\\/${var.helper_private_ip}:8080\\/install\\/bios.raw.gz coreos.inst.ignition_url=http:\\/\\/${var.helper_private_ip}:8080\\/ignition\\/${local.all_type[count.index]}.ign/g' /tmp/${local.all_hostnames[count.index]}/isolinux/isolinux.cfg",
+      "sed -i 's/coreos.inst=yes/coreos.inst=yes ip=${local.all_ips[count.index]}::${var.private_gateway}:${local.coreos_netmask}:${local.all_hostnames[count.index]}.${var.cluster_id}.${var.base_domain}:${var.network_device}:none ${local.nameservers} coreos.inst.install_dev=sda coreos.inst.image_url=http:\\/\\/${var.helper_private_ip}:8080\\/install\\/bios.raw.gz coreos.inst.ignition_url=http:\\/\\/${var.helper_private_ip}:8080\\/ignition\\/${local.all_ignition[count.index]}.ign/g' /tmp/${local.all_hostnames[count.index]}/isolinux/isolinux.cfg",
       "mkisofs -o /tmp/${var.cluster_id}-${local.all_type[count.index]}-${local.all_index[count.index]}.iso -rational-rock -J -joliet-long -eltorito-boot isolinux/isolinux.bin -eltorito-catalog isolinux/boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table /tmp/${local.all_hostnames[count.index]} > /dev/null 2>&1",
       "export GOVC_URL=${var.vsphere_server}",
       "export GOVC_USERNAME=${var.vsphere_username}",
@@ -136,7 +163,7 @@ resource "null_resource" "generateisos" {
       "export GOVC_USERNAME=${var.vsphere_username}",
       "export GOVC_PASSWORD=${var.vsphere_password}",
       "export GOVC_INSECURE=${var.vsphere_allow_insecure}",
-      "govc datastore.rm -ds=${var.vsphere_image_datastore} ${var.vsphere_image_datastore_path}/${var.cluster_id}-${local.all_type[count.index]}-${local.all_index[count.index]}.iso  > /dev/null 2>&1"
+      "govc datastore.rm -ds=${var.vsphere_image_datastore} ${var.vsphere_image_datastore_path}/${var.cluster_id}-${local.all_type[count.index]}-${local.all_index[count.index]}.iso  > /dev/null 2>&1 || true"
     ]
   }
 }

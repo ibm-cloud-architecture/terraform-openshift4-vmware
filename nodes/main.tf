@@ -10,7 +10,7 @@ resource "vsphere_virtual_machine" "vm" {
     null_resource.dependency
   ]
 
-  name             = "${var.cluster_id}-${var.vmtype}-${count.index + var.count_offset + 1}"
+  name             = "${var.cluster_id}-${var.vmtype}-${count.index + 1}"
   resource_pool_id = var.resource_pool_id
   datastore_id     = var.datastore_id
   folder           = var.folder
@@ -32,7 +32,24 @@ resource "vsphere_virtual_machine" "vm" {
 
   cdrom {
     datastore_id = var.image_datastore_id
-    path         = "${var.image_datastore_path}/${var.cluster_id}-${var.vmtype}-${count.index + var.count_offset + 1}.iso"
+    path         = "${var.image_datastore_path}/${var.cluster_id}-${var.vmtype}-${count.index + 1}.iso"
+  }
+
+  connection {
+    host        = self.default_ip_address
+    user        = "core"
+    private_key = var.ssh_private_key
+
+    bastion_host        = var.helper_public_ip
+    bastion_user        = var.helper["username"]
+    bastion_password    = var.helper["password"]
+    bastion_private_key = var.ssh_private_key
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "sudo eject cdrom",
+    ]
   }
 }
 

@@ -120,6 +120,7 @@ module "ignition" {
 module "bootstrap" {
   source = "./bootstrap"
   dependson = [
+    module.createisos.module_completed,
     module.ignition.module_completed
   ]
   vminfo               = var.bootstrap
@@ -130,12 +131,17 @@ module "bootstrap" {
   folder               = vsphere_folder.folder.path
   cluster_id           = var.openshift_cluster_id
   network_id           = data.vsphere_network.private.id
+  helper               = var.helper
+  helper_public_ip     = var.helper_public_ip
+  ssh_private_key      = tls_private_key.installkey.private_key_pem
 }
 
 module "master" {
   source = "./nodes"
   dependson = [
-    module.ignition.module_completed
+    module.createisos.module_completed,
+    module.ignition.module_completed,
+    module.bootstrap.module_completed,
   ]
   vminfo               = var.master
   vmtype               = "master"
@@ -146,12 +152,17 @@ module "master" {
   folder               = vsphere_folder.folder.path
   cluster_id           = var.openshift_cluster_id
   network_id           = data.vsphere_network.private.id
+  helper               = var.helper
+  helper_public_ip     = var.helper_public_ip
+  ssh_private_key      = tls_private_key.installkey.private_key_pem
 }
 
 module "worker" {
   source = "./nodes"
   dependson = [
-    module.ignition.module_completed
+    module.createisos.module_completed,
+    module.ignition.module_completed,
+    module.bootstrap.module_completed,
   ]
   vminfo               = var.worker
   vmtype               = "worker"
@@ -162,16 +173,19 @@ module "worker" {
   folder               = vsphere_folder.folder.path
   cluster_id           = var.openshift_cluster_id
   network_id           = data.vsphere_network.private.id
+  helper               = var.helper
+  helper_public_ip     = var.helper_public_ip
+  ssh_private_key      = tls_private_key.installkey.private_key_pem
 }
 
 module "storage" {
-  source       = "./nodes"
-  count_offset = var.worker["count"]
+  source = "./nodes"
   dependson = [
+    module.createisos.module_completed,
     module.ignition.module_completed
   ]
   vminfo               = var.storage
-  vmtype               = "worker"
+  vmtype               = "storage"
   resource_pool_id     = vsphere_resource_pool.pool.id
   datastore_id         = data.vsphere_datastore.node.id
   image_datastore_id   = data.vsphere_datastore.images.id
@@ -179,10 +193,14 @@ module "storage" {
   folder               = vsphere_folder.folder.path
   cluster_id           = var.openshift_cluster_id
   network_id           = data.vsphere_network.private.id
+  helper               = var.helper
+  helper_public_ip     = var.helper_public_ip
+  ssh_private_key      = tls_private_key.installkey.private_key_pem
 }
 
 module "deploy" {
   dependson = [
+    module.createisos.module_completed,
     module.ignition.module_completed,
     module.master.module_completed,
     module.worker.module_completed,
@@ -196,6 +214,31 @@ module "deploy" {
   storage_hostnames = var.storage_hostnames
   cluster_id        = var.openshift_cluster_id
   base_domain       = var.openshift_base_domain
+}
+
+module "post" {
+  dependson = [
+    module.createisos.module_completed,
+    module.ignition.module_completed,
+    module.master.module_completed,
+    module.worker.module_completed,
+    module.storage.module_completed,
+    module.deploy.module_completed
+  ]
+  source               = "./post"
+  helper               = var.helper
+  helper_public_ip     = var.helper_public_ip
+  ssh_private_key      = tls_private_key.installkey.private_key_pem
+  master_hostnames     = var.master_hostnames
+  worker_hostnames     = var.worker_hostnames
+  storage_hostnames    = var.storage_hostnames
+  apps_certificate     = var.apps_certificate
+  apps_certificate_key = var.apps_certificate_key
+  api_certificate      = var.api_certificate
+  api_certificate_key  = var.api_certificate_key
+  custom_ca_bundle     = var.custom_ca_bundle
+  base_domain          = var.openshift_base_domain
+  cluster_id           = var.openshift_cluster_id
 }
 
 resource "vsphere_folder" "folder" {
