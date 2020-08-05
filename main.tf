@@ -11,17 +11,17 @@ resource "tls_private_key" "installkey" {
   rsa_bits  = 4096
 }
 
-# resource "local_file" "write_private_key" {
-#   content         = tls_private_key.installkey.private_key_pem
-#   filename        = "${path.root}/artifacts/openshift_rsa"
-#   file_permission = 0600
-# }
+resource "local_file" "write_private_key" {
+  content         = tls_private_key.installkey.private_key_pem
+  filename        = "${path.root}/artifacts/openshift_rsa"
+  file_permission = 0600
+}
 
-# resource "local_file" "write_public_key" {
-#   content         = tls_private_key.installkey.public_key_openssh
-#   filename        = "${path.root}/artifacts/openshift_rsa.pub"
-#   file_permission = 0600
-# }
+resource "local_file" "write_public_key" {
+  content         = tls_private_key.installkey.public_key_openssh
+  filename        = "${path.root}/artifacts/openshift_rsa.pub"
+  file_permission = 0600
+}
 
 module "helper" {
   source             = "./helper"
@@ -163,6 +163,7 @@ module "worker" {
     module.createisos.module_completed,
     module.ignition.module_completed,
     module.bootstrap.module_completed,
+    #    module.master.module_completed,
   ]
   vminfo               = var.worker
   vmtype               = "worker"
@@ -182,7 +183,9 @@ module "storage" {
   source = "./nodes"
   dependson = [
     module.createisos.module_completed,
-    module.ignition.module_completed
+    module.ignition.module_completed,
+    module.bootstrap.module_completed,
+    #    module.master.module_completed,
   ]
   vminfo               = var.storage
   vmtype               = "storage"
@@ -214,31 +217,6 @@ module "deploy" {
   storage_hostnames = var.storage_hostnames
   cluster_id        = var.openshift_cluster_id
   base_domain       = var.openshift_base_domain
-}
-
-module "post" {
-  dependson = [
-    module.createisos.module_completed,
-    module.ignition.module_completed,
-    module.master.module_completed,
-    module.worker.module_completed,
-    module.storage.module_completed,
-    module.deploy.module_completed
-  ]
-  source               = "./post"
-  helper               = var.helper
-  helper_public_ip     = var.helper_public_ip
-  ssh_private_key      = tls_private_key.installkey.private_key_pem
-  master_hostnames     = var.master_hostnames
-  worker_hostnames     = var.worker_hostnames
-  storage_hostnames    = var.storage_hostnames
-  apps_certificate     = var.apps_certificate
-  apps_certificate_key = var.apps_certificate_key
-  api_certificate      = var.api_certificate
-  api_certificate_key  = var.api_certificate_key
-  custom_ca_bundle     = var.custom_ca_bundle
-  base_domain          = var.openshift_base_domain
-  cluster_id           = var.openshift_cluster_id
 }
 
 resource "vsphere_folder" "folder" {

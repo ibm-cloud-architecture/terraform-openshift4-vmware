@@ -18,7 +18,13 @@ resource "null_resource" "waitfor" {
 
   provisioner "remote-exec" {
     inline = [
+      "export KUBECONFIG=/home/${var.helper["username"]}/installer/auth/kubeconfig",
       "/usr/local/bin/openshift-install --dir=installer wait-for bootstrap-complete",
+      "echo sleeping for 5 minutes to then approve all csrs",
+      "sleep 300",
+      "oc get csr -o name|xargs oc adm certificate approve > /dev/null",
+      "sleep 60",
+      "oc get csr -o name|xargs oc adm certificate approve > /dev/null",
       "/usr/local/bin/openshift-install --dir=installer wait-for install-complete",
     ]
   }

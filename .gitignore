@@ -17,3 +17,4 @@ pull-secret
 # local
 makefile
 **/artifacts/*
+**/post/*

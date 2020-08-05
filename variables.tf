@@ -195,7 +195,7 @@ variable "master_ips" {
 variable "worker" {
   type = map(string)
   default = {
-    count  = 3
+    count  = 2
     cpu    = 8
     memory = 32
     disk   = 128

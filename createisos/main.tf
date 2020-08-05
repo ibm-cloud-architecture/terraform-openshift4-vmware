@@ -155,15 +155,4 @@ resource "null_resource" "generateisos" {
       "govc datastore.upload -ds=${var.vsphere_image_datastore} /tmp/${var.cluster_id}-${local.all_type[count.index]}-${local.all_index[count.index]}.iso ${var.vsphere_image_datastore_path}/${var.cluster_id}-${local.all_type[count.index]}-${local.all_index[count.index]}.iso  > /dev/null 2>&1"
     ]
   }
-
-  provisioner "remote-exec" {
-    when = destroy
-    inline = [
-      "export GOVC_URL=${var.vsphere_server}",
-      "export GOVC_USERNAME=${var.vsphere_username}",
-      "export GOVC_PASSWORD=${var.vsphere_password}",
-      "export GOVC_INSECURE=${var.vsphere_allow_insecure}",
-      "govc datastore.rm -ds=${var.vsphere_image_datastore} ${var.vsphere_image_datastore_path}/${var.cluster_id}-${local.all_type[count.index]}-${local.all_index[count.index]}.iso  > /dev/null 2>&1 || true"
-    ]
-  }
 }
