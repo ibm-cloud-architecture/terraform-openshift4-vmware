@@ -43,6 +43,7 @@ $ terraform apply
 | vsphere_public_network       | vSphere public Network for OpenShift nodes                   | string | - |
 | vsphere_folder               | vSphere Folder where VMs will be deployed into               | string | - |
 | vsphere_resource_pool        | vSphere Resource Pool where VMs will be deployed into        | string | - |
+| preexisting_resource_pool    | Indicates whether vSphere Resource Pool already exists       | bool   | false |
 | binaries                     | map with URLs for openshift components                       | map    | See `terraform.tfvars.example` |
 | openshift_base_domain        | Base domain for your OpenShift Cluster                       | string | - |
 | openshift_cluster_id         | Name of your OpenShift cluster.  Cluster will be reachable at `api.$openshift_cluster_id.$openshift_base_domain`. | string | - |
