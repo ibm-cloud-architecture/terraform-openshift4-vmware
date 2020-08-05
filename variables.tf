@@ -59,6 +59,11 @@ variable "vsphere_resource_pool" {
   type    = string
   default = ""
 }
+
+variable "preexisting_resource_pool" {
+  type    = bool
+  default = false
+}
 # ====================================
 
 
