@@ -5,6 +5,10 @@ provider "vsphere" {
   allow_unverified_ssl = var.vsphere_allow_insecure
 }
 
+locals {
+  resource_pool_id = var.preexisting_resource_pool ? data.vsphere_resource_pool.pool[0].id : vsphere_resource_pool.pool[0].id
+}
+
 # SSH Key for VMs
 resource "tls_private_key" "installkey" {
   algorithm = "RSA"
@@ -27,7 +31,7 @@ module "helper" {
   source             = "./helper"
   datacenter_id      = data.vsphere_datacenter.datacenter.id
   datastore_id       = data.vsphere_datastore.node.id
-  resource_pool_id   = var.preexisting_resource_pool ? data.vsphere_resource_pool.pool[0].id : vsphere_resource_pool.pool[0].id
+  resource_pool_id   = local.resource_pool_id
   folder_id          = vsphere_folder.folder.path
   vminfo             = var.helper
   public_ip          = var.helper_public_ip
@@ -124,7 +128,7 @@ module "bootstrap" {
     module.ignition.module_completed
   ]
   vminfo               = var.bootstrap
-  resource_pool_id     = var.preexisting_resource_pool ? data.vsphere_resource_pool.pool[0].id : vsphere_resource_pool.pool[0].id
+  resource_pool_id     = local.resource_pool_id
   datastore_id         = data.vsphere_datastore.node.id
   image_datastore_id   = data.vsphere_datastore.images.id
   image_datastore_path = var.vsphere_image_datastore_path
@@ -145,7 +149,7 @@ module "master" {
   ]
   vminfo               = var.master
   vmtype               = "master"
-  resource_pool_id     = var.preexisting_resource_pool ? data.vsphere_resource_pool.pool[0].id : vsphere_resource_pool.pool[0].id
+  resource_pool_id     = local.resource_pool_id
   datastore_id         = data.vsphere_datastore.node.id
   image_datastore_id   = data.vsphere_datastore.images.id
   image_datastore_path = var.vsphere_image_datastore_path
@@ -167,7 +171,7 @@ module "worker" {
   ]
   vminfo               = var.worker
   vmtype               = "worker"
-  resource_pool_id     = var.preexisting_resource_pool ? data.vsphere_resource_pool.pool[0].id : vsphere_resource_pool.pool[0].id
+  resource_pool_id     = local.resource_pool_id
   datastore_id         = data.vsphere_datastore.node.id
   image_datastore_id   = data.vsphere_datastore.images.id
   image_datastore_path = var.vsphere_image_datastore_path
@@ -189,7 +193,7 @@ module "storage" {
   ]
   vminfo               = var.storage
   vmtype               = "storage"
-  resource_pool_id     = var.preexisting_resource_pool ? data.vsphere_resource_pool.pool[0].id : vsphere_resource_pool.pool[0].id
+  resource_pool_id     = local.resource_pool_id
   datastore_id         = data.vsphere_datastore.node.id
   image_datastore_id   = data.vsphere_datastore.images.id
   image_datastore_path = var.vsphere_image_datastore_path
