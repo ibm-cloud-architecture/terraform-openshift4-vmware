@@ -11,23 +11,23 @@ resource "tls_private_key" "installkey" {
   rsa_bits  = 4096
 }
 
-# resource "local_file" "write_private_key" {
-#   content         = tls_private_key.installkey.private_key_pem
-#   filename        = "${path.root}/artifacts/openshift_rsa"
-#   file_permission = 0600
-# }
+resource "local_file" "write_private_key" {
+  content         = tls_private_key.installkey.private_key_pem
+  filename        = "${path.root}/artifacts/openshift_rsa"
+  file_permission = 0600
+}
 
-# resource "local_file" "write_public_key" {
-#   content         = tls_private_key.installkey.public_key_openssh
-#   filename        = "${path.root}/artifacts/openshift_rsa.pub"
-#   file_permission = 0600
-# }
+resource "local_file" "write_public_key" {
+  content         = tls_private_key.installkey.public_key_openssh
+  filename        = "${path.root}/artifacts/openshift_rsa.pub"
+  file_permission = 0600
+}
 
 module "helper" {
   source             = "./helper"
   datacenter_id      = data.vsphere_datacenter.datacenter.id
   datastore_id       = data.vsphere_datastore.node.id
-  resource_pool_id   = vsphere_resource_pool.pool.id
+  resource_pool_id   = var.preexisting_resource_pool ? data.vsphere_resource_pool.pool[0].id : vsphere_resource_pool.pool[0].id
   folder_id          = vsphere_folder.folder.path
   vminfo             = var.helper
   public_ip          = var.helper_public_ip
@@ -124,7 +124,7 @@ module "bootstrap" {
     module.ignition.module_completed
   ]
   vminfo               = var.bootstrap
-  resource_pool_id     = vsphere_resource_pool.pool.id
+  resource_pool_id     = var.preexisting_resource_pool ? data.vsphere_resource_pool.pool[0].id : vsphere_resource_pool.pool[0].id
   datastore_id         = data.vsphere_datastore.node.id
   image_datastore_id   = data.vsphere_datastore.images.id
   image_datastore_path = var.vsphere_image_datastore_path
@@ -145,7 +145,7 @@ module "master" {
   ]
   vminfo               = var.master
   vmtype               = "master"
-  resource_pool_id     = vsphere_resource_pool.pool.id
+  resource_pool_id     = var.preexisting_resource_pool ? data.vsphere_resource_pool.pool[0].id : vsphere_resource_pool.pool[0].id
   datastore_id         = data.vsphere_datastore.node.id
   image_datastore_id   = data.vsphere_datastore.images.id
   image_datastore_path = var.vsphere_image_datastore_path
@@ -163,10 +163,11 @@ module "worker" {
     module.createisos.module_completed,
     module.ignition.module_completed,
     module.bootstrap.module_completed,
+    #    module.master.module_completed,
   ]
   vminfo               = var.worker
   vmtype               = "worker"
-  resource_pool_id     = vsphere_resource_pool.pool.id
+  resource_pool_id     = var.preexisting_resource_pool ? data.vsphere_resource_pool.pool[0].id : vsphere_resource_pool.pool[0].id
   datastore_id         = data.vsphere_datastore.node.id
   image_datastore_id   = data.vsphere_datastore.images.id
   image_datastore_path = var.vsphere_image_datastore_path
@@ -182,11 +183,13 @@ module "storage" {
   source = "./nodes"
   dependson = [
     module.createisos.module_completed,
-    module.ignition.module_completed
+    module.ignition.module_completed,
+    module.bootstrap.module_completed,
+    #    module.master.module_completed,
   ]
   vminfo               = var.storage
   vmtype               = "storage"
-  resource_pool_id     = vsphere_resource_pool.pool.id
+  resource_pool_id     = var.preexisting_resource_pool ? data.vsphere_resource_pool.pool[0].id : vsphere_resource_pool.pool[0].id
   datastore_id         = data.vsphere_datastore.node.id
   image_datastore_id   = data.vsphere_datastore.images.id
   image_datastore_path = var.vsphere_image_datastore_path
@@ -216,31 +219,6 @@ module "deploy" {
   base_domain       = var.openshift_base_domain
 }
 
-module "post" {
-  dependson = [
-    module.createisos.module_completed,
-    module.ignition.module_completed,
-    module.master.module_completed,
-    module.worker.module_completed,
-    module.storage.module_completed,
-    module.deploy.module_completed
-  ]
-  source               = "./post"
-  helper               = var.helper
-  helper_public_ip     = var.helper_public_ip
-  ssh_private_key      = tls_private_key.installkey.private_key_pem
-  master_hostnames     = var.master_hostnames
-  worker_hostnames     = var.worker_hostnames
-  storage_hostnames    = var.storage_hostnames
-  apps_certificate     = var.apps_certificate
-  apps_certificate_key = var.apps_certificate_key
-  api_certificate      = var.api_certificate
-  api_certificate_key  = var.api_certificate_key
-  custom_ca_bundle     = var.custom_ca_bundle
-  base_domain          = var.openshift_base_domain
-  cluster_id           = var.openshift_cluster_id
-}
-
 resource "vsphere_folder" "folder" {
   path          = var.openshift_cluster_id
   type          = "vm"
@@ -248,6 +226,13 @@ resource "vsphere_folder" "folder" {
 }
 
 resource "vsphere_resource_pool" "pool" {
+  count                   = var.preexisting_resource_pool ? 0 : 1
   name                    = var.openshift_cluster_id
   parent_resource_pool_id = data.vsphere_compute_cluster.cluster.resource_pool_id
+}
+
+data "vsphere_resource_pool" "pool" {
+  count         = var.preexisting_resource_pool ? 1 : 0
+  name          = "/${var.vsphere_datacenter}/host/${var.vsphere_cluster}/Resources/${var.vsphere_resource_pool}"
+  datacenter_id = data.vsphere_datacenter.datacenter.id
 }

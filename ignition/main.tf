@@ -59,6 +59,9 @@ resource "null_resource" "generate_ignition" {
     inline = [
       "mkdir installer/",
       "cp /tmp/install-config.yaml installer/",
+      "/usr/local/bin/openshift-install --dir=installer create manifests",
+      "rm installer/openshift/99_openshift-cluster-api_master-machines*",
+      "rm installer/openshift/99_openshift-cluster-api_worker-machineset*",
       "/usr/local/bin/openshift-install --dir=installer create ignition-configs",
       "sudo cp installer/*.ign /var/www/html/ignition/",
       "sudo chmod -R 644 /var/www/html/ignition/*.ign",

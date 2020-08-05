@@ -23,7 +23,9 @@ resource "vsphere_virtual_machine" "vm" {
     network_id = var.network_id
   }
 
-  enable_disk_uuid = true
+  enable_disk_uuid           = true
+  wait_for_guest_net_timeout = 0
+  wait_for_guest_ip_timeout  = 0
   disk {
     label            = "disk0"
     size             = var.vminfo["disk"]
@@ -35,22 +37,6 @@ resource "vsphere_virtual_machine" "vm" {
     path         = "${var.image_datastore_path}/${var.cluster_id}-${var.vmtype}-${count.index + 1}.iso"
   }
 
-  connection {
-    host        = self.default_ip_address
-    user        = "core"
-    private_key = var.ssh_private_key
-
-    bastion_host        = var.helper_public_ip
-    bastion_user        = var.helper["username"]
-    bastion_password    = var.helper["password"]
-    bastion_private_key = var.ssh_private_key
-  }
-
-  provisioner "remote-exec" {
-    inline = [
-      "sudo eject cdrom",
-    ]
-  }
 }
 
 

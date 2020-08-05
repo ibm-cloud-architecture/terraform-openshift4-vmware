@@ -59,6 +59,11 @@ variable "vsphere_resource_pool" {
   type    = string
   default = ""
 }
+
+variable "preexisting_resource_pool" {
+  type    = bool
+  default = false
+}
 # ====================================
 
 
@@ -195,7 +200,7 @@ variable "master_ips" {
 variable "worker" {
   type = map(string)
   default = {
-    count  = 3
+    count  = 2
     cpu    = 8
     memory = 32
     disk   = 128
@@ -237,30 +242,3 @@ variable "use_helper_for_node_dns" {
   default = true
 }
 
-
-
-## SSL Certificates
-variable "apps_certificate" {
-  type    = string
-  default = null
-}
-
-variable "apps_certificate_key" {
-  type    = string
-  default = null
-}
-
-variable "api_certificate" {
-  type    = string
-  default = null
-}
-
-variable "api_certificate_key" {
-  type    = string
-  default = null
-}
-
-variable "custom_ca_bundle" {
-  type    = string
-  default = null
-}
