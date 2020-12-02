@@ -25,10 +25,12 @@ OpenShift 4.6 User-Provided Infrastructure
     - Point both of those DNS A or CNAME records to either your LoadBalancers or the public IP address of the CoreOS LoadBalancer VM
 2. [CoreOS OVA](http://mirror.openshift.com/pub/openshift-v4/dependencies/rhcos/) must be uploaded to vCenter as a template.
 
+
+
 ## Installation Process
 
 ```bash
-$ git clone https://github.com/ibm-cloud-architecture/terraform-openshift4-vmware
+$ git clone https://github.com/ncolon/terraform-openshift4-vmware
 $ cd terraform-openshift4-vmware
 ```
 
@@ -40,6 +42,8 @@ $ terraform init
 $ terraform plan
 $ terraform apply
 ```
+
+
 
 ## terraform variables
 
