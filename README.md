@@ -1,6 +1,18 @@
-# terraform-openshift4-vmware
+# OpenShift 4.6 UPI Deployment with Static IPs
 
-Deploy OpenShift 4.6 and later using static IP addresses for master and worker nodes. 
+Deploy OpenShift 4.6 and later using static IP addresses for CoreOS nodes.
+
+**NOTE**: This requires OpenShift 4.6 or later to deploy, if you're looking for 4.5 or earlier, take a look at the `pre-4.6` branch
+
+
+
+## Architecture
+
+OpenShift 4.6 User-Provided Infrastructure
+
+
+
+![](./media/topology.png	)
 
 ## Prereqs
 
