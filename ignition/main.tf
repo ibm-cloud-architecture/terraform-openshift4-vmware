@@ -1,27 +1,32 @@
-resource "null_resource" "dependency" {
-  triggers = {
-    all_dependencies = join(",", var.dependson)
-  }
-}
-
 data "template_file" "install_config" {
   template = <<EOF
 apiVersion: v1
 baseDomain: ${var.base_domain}
 compute:
-- hyperthreading: Enabled
+- architecture: amd64
+  hyperthreading: Enabled
   name: worker
-  replicas: ${var.worker["count"] + var.storage["count"]}
+  replicas: 0
 controlPlane:
+  architecture: amd64
   hyperthreading: Enabled
   name: master
-  replicas: ${var.master["count"]}
+  platform:
+    vsphere:
+      coresPerSocket: 1
+      cpus: ${var.master_cpu}
+      memoryMB: ${var.master_memory}
+      osDisk:
+        diskSizeGB: ${var.master_disk_size}
+  replicas: 3
 metadata:
   name: ${var.cluster_id}
 networking:
-  clusterNetworks:
+  clusterNetwork:
   - cidr: ${var.cluster_cidr}
     hostPrefix: ${var.cluster_hostprefix}
+  machineNetwork:
+  - cidr: ${var.machine_cidr}
   networkType: OpenShiftSDN
   serviceNetwork:
   - ${var.cluster_servicecidr}
@@ -32,39 +37,136 @@ platform:
     password: ${var.vsphere_password}
     datacenter: ${var.vsphere_datacenter}
     defaultDatastore: ${var.vsphere_datastore}
-pullSecret: '${file(var.pull_secret)}'
+pullSecret: '${chomp(file(var.pull_secret))}'
 sshKey: '${var.ssh_public_key}'
 EOF
 }
 
 
-resource "null_resource" "generate_ignition" {
-  depends_on = [
-    null_resource.dependency
-  ]
+data "template_file" "cluster_scheduler" {
+  template = <<EOF
+apiVersion: config.openshift.io/v1
+kind: Scheduler
+metadata:
+  creationTimestamp: null
+  name: cluster
+spec:
+  mastersSchedulable: false
+  policy:
+    name: ""
+status: {}
+EOF
+}
 
-  connection {
-    host        = var.helper_public_ip
-    user        = var.helper["username"]
-    password    = var.helper["password"]
-    private_key = var.ssh_private_key
-  }
+data "template_file" "post_deployment_05" {
+  template = templatefile("${path.module}/templates/99_05-post-deployment.yaml", {
+    csr_common_secret  = base64encode(file("${path.module}/templates/common.sh"))
+    csr_approve_secret = base64encode(file("${path.module}/templates/approve-csrs.sh"))
+  })
+}
 
-  provisioner "file" {
-    content     = data.template_file.install_config.rendered
-    destination = "/tmp/install-config.yaml"
-  }
+data "template_file" "post_deployment_06" {
+  template = templatefile("${path.module}/templates/99_06-post-deployment.yaml", {
+    node_count = var.total_node_count
+  })
+}
 
-  provisioner "remote-exec" {
-    inline = [
-      "mkdir installer/",
-      "cp /tmp/install-config.yaml installer/",
-      "/usr/local/bin/openshift-install --dir=installer create manifests",
-      "rm installer/openshift/99_openshift-cluster-api_master-machines*",
-      "rm installer/openshift/99_openshift-cluster-api_worker-machineset*",
-      "/usr/local/bin/openshift-install --dir=installer create ignition-configs",
-      "sudo cp installer/*.ign /var/www/html/ignition/",
-      "sudo chmod -R 644 /var/www/html/ignition/*.ign",
-    ]
+locals {
+  installerdir = "${path.root}/installer/${var.cluster_id}"
+}
+
+resource "null_resource" "download_binaries" {
+  provisioner "local-exec" {
+    command = <<EOF
+set -ex
+test -e ${local.installerdir} || mkdir -p ${local.installerdir}
+if [[ $(uname -s) == "Darwin" ]]; then PLATFORM="mac"; else PLATFOMR="linux"; fi
+curl -o ${local.installerdir}/openshift-installer.tar.gz https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/latest-${var.openshift_version}/openshift-install-$PLATFORM.tar.gz
+tar -xf ${local.installerdir}/openshift-installer.tar.gz -C ${local.installerdir}
+EOF
   }
 }
+
+resource "local_file" "install_config_yaml" {
+  content  = data.template_file.install_config.rendered
+  filename = "${local.installerdir}/install-config.yaml"
+  depends_on = [
+    null_resource.download_binaries,
+  ]
+}
+
+resource "null_resource" "generate_manifests" {
+  provisioner "local-exec" {
+    command = <<EOF
+set -ex
+${local.installerdir}/openshift-install --dir=${local.installerdir}/ create manifests --log-level debug
+rm ${local.installerdir}/openshift/99_openshift-cluster-api_master-machines*
+rm ${local.installerdir}/openshift/99_openshift-cluster-api_worker-machineset*
+cp ${path.module}/templates/99_01-post-deployment.yaml ${local.installerdir}/manifests
+cp ${path.module}/templates/99_02-post-deployment.yaml ${local.installerdir}/manifests
+cp ${path.module}/templates/99_03-post-deployment.yaml ${local.installerdir}/manifests
+cp ${path.module}/templates/99_04-post-deployment.yaml ${local.installerdir}/manifests
+EOF
+  }
+  depends_on = [
+    local_file.install_config_yaml
+  ]
+}
+
+resource "local_file" "cluster_scheduler" {
+  content  = data.template_file.cluster_scheduler.rendered
+  filename = "${local.installerdir}/manifests/cluster-scheduler-02-config.yml"
+  depends_on = [
+    null_resource.generate_manifests,
+  ]
+}
+
+resource "local_file" "post_deployment_05" {
+  content  = data.template_file.post_deployment_05.rendered
+  filename = "${local.installerdir}/manifests/99_05-post-deployment.yaml"
+  depends_on = [
+    null_resource.generate_manifests,
+  ]
+}
+
+resource "local_file" "post_deployment_06" {
+  content  = data.template_file.post_deployment_06.rendered
+  filename = "${local.installerdir}/manifests/99_06-post-deployment.yaml"
+  depends_on = [
+    null_resource.generate_manifests,
+  ]
+}
+
+resource "null_resource" "generate_ignition" {
+  provisioner "local-exec" {
+    command = "${local.installerdir}/openshift-install --dir=${local.installerdir}/ create ignition-configs --log-level debug"
+  }
+  depends_on = [
+    local_file.cluster_scheduler,
+    local_file.post_deployment_05,
+    local_file.post_deployment_06
+  ]
+}
+
+
+data "local_file" "bootstrap_ignition" {
+  filename = "${local.installerdir}/bootstrap.ign"
+  depends_on = [
+    null_resource.generate_ignition
+  ]
+}
+
+data "local_file" "master_ignition" {
+  filename = "${local.installerdir}/master.ign"
+  depends_on = [
+    null_resource.generate_ignition
+  ]
+}
+
+data "local_file" "worker_ignition" {
+  filename = "${local.installerdir}/worker.ign"
+  depends_on = [
+    null_resource.generate_ignition
+  ]
+}
+

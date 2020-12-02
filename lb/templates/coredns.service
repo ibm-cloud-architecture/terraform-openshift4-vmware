@@ -1,0 +1,19 @@
+[Unit]
+Description=coredns
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+TimeoutStartSec=0
+ExecStartPre=-/bin/podman kill coredns
+ExecStartPre=-/bin/podman rm coredns
+ExecStartPre=/bin/podman pull docker.io/coredns/coredns
+ExecStart=/bin/podman run --name coredns \
+  --net=host \
+  --privileged \
+  -v /etc/coredns:/data:ro \
+  --restart=always \
+  docker.io/coredns/coredns -conf /data/Corefile
+
+[Install]
+WantedBy=multi-user.target

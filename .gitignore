@@ -12,9 +12,10 @@
 .DS_Store
 
 # openshift pull-secret
-pull-secret
+pull-secret.txt
 
 # local
 makefile
 **/artifacts/*
-**/post/*
+**/terraform.tfstate.d/*
+**/installer/*

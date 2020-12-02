@@ -1,0 +1,10 @@
+---
+apiVersion: v1
+kind: Secret
+data:
+  common.sh: ${csr_common_secret}
+  approve-csrs.sh: ${csr_approve_secret}
+metadata:
+  name: approve-csrs-scripts
+  namespace: ibm-post-deployment
+type: Opaque
