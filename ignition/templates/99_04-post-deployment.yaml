@@ -1,0 +1,13 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRoleBinding
+metadata:
+  name: ibm:post-deployment
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: ibm:post-deployment
+subjects:
+  - kind: ServiceAccount
+    name: ibm-deployment-sa
+    namespace: ibm-post-deployment

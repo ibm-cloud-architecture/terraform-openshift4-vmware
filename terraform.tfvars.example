@@ -1,101 +1,76 @@
-vsphere_username = "username"
-vsphere_password = "password"
-vsphere_server   = "9.42.67.251"
+// ID identifying the cluster to create. Use your username so that resources created can be tracked back to you.
+cluster_id = "upi46"
 
-vsphere_datacenter           = "dc01"
-vsphere_cluster              = "cluster01"
-vsphere_node_datastore       = "dc01-ocp01"
-vsphere_image_datastore      = "dc01-ocp01"
-vsphere_public_network       = "vDPortGroup"
-vsphere_private_network      = "vdpg-192.168.100"
-vsphere_image_datastore_path = "images"
+// Base domain from which the cluster domain is a subdomain.
+base_domain = "ncolon.xyz"
 
-public_network_gateway = "9.42.67.129"
-public_network_netmask = 25
-public_network_nameservers = [
-  "9.42.106.2",
-  "9.42.106.3"
-]
-private_network_gateway = "192.168.100.1"
-private_network_netmask = 24
+// Name of the vSphere server. The dev cluster is on "vcsa.vmware.devcluster.openshift.com".
+vsphere_server = "vcsa67.rtp.raleigh.ibm.com"
 
+// User on the vSphere server.
+vsphere_user = "administrator@vsphere.local"
 
-openshift_cluster_id  = "test43"
-openshift_base_domain = "ncolon.xyz"
+// Password of the user on the vSphere server.
+vsphere_password = "MySecretPa55w0rd"
+
+// Name of the vSphere cluster. The dev cluster is "devel".
+vsphere_cluster = "cluster01"
+
+// Name of the vSphere data center. The dev cluster is "dc1".
+vsphere_datacenter = "dc01"
+
+// Name of the vSphere data store to use for the VMs. The dev cluster uses "nvme-ds1".
+vsphere_datastore = "openshift"
+
+// Name of the RHCOS VM template to clone to create VMs for the cluster
+vm_template = "rhcos-4.6-template"
+
+// Name of the VM Network for your cluster nodes
+vm_network = "vdpg-192.168.100"
+
+// Name of the VM Network for loadbalancer NIC in loadbalancer.
+loadbalancer_network = "vDPortGroup"
+
+// The machine_cidr where IP addresses will be assigned for cluster nodes.
+// Additionally, IPAM will assign IPs based on the network ID. 
+machine_cidr = "192.168.100.0/24"
+
+// The number of control plane VMs to create. Default is 3.
+control_plane_count = 3
+
+// The number of compute VMs to create. Default is 3.
+compute_count = 3
+
+// Ignition config path for the control plane machines
+control_plane_ignition_path = "./master.ign"
+
+// Ignition config path for the compute machines
+compute_ignition_path = "./worker.ign"
+
+// Set bootstrap_ip, control_plane_ip, and compute_ip if you want to use static
+// IPs reserved someone else, rather than the IPAM server.
+
+// The IP address to assign to the bootstrap VM.
+bootstrap_ip_address = "192.168.100.80"
+
+// The IP addresses to assign to the control plane VMs. The length of this list
+// must match the value of control_plane_count.
+control_plane_ip_addresses = ["192.168.100.81", "192.168.100.82", "192.168.100.83"]
+
+// The IP addresses to assign to the compute VMs. The length of this list must
+// match the value of compute_count.
+compute_ip_addresses = ["192.168.100.84", "192.168.100.85", "192.168.100.86"]
+
+// The IP address to assign to the loadbalancer VM.
+lb_ip_address = "192.168.100.79"
+
+// The IP address to assign to the public loadbalancer interface
+loadbalancer_lb_ip_address = "9.42.67.139"
+loadbalancer_lb_machine_cidr = "9.42.67.128/25"
+
+vm_dns_addresses = ["9.42.106.2", "9.42.106.3"]
+
 openshift_pull_secret = "~/.pull-secret"
-
-helper = {
-  template       = "helper-template"
-  username       = "templateusername"
-  password       = "templatepassword"
-  cpu            = 4
-  memory         = 16384
-  disk           = 64
-  network_device = "ens192"
-}
-
-helper_public_ip  = "9.42.67.202"
-helper_private_ip = "192.168.100.100"
-
-bootstrap = {
-  cpu    = 4
-  memory = 16384
-  disk   = 128
-}
-bootstrap_hostname = "bootstrap"
-bootstrap_ip       = "192.168.100.101"
-
-master = {
-  count  = 3
-  cpu    = 4
-  memory = 16384
-  disk   = 128
-}
-
-master_hostnames = [
-  "master01",
-  "master02",
-  "master03"
-]
-
-master_ips = [
-  "192.168.100.102",
-  "192.168.100.103",
-  "192.168.100.104",
-]
-
-worker = {
-  count  = 2
-  cpu    = 4
-  memory = 16384
-  disk   = 128
-}
-
-worker_hostnames = [
-  "worker01",
-  "worker02",
-]
-
-worker_ips = [
-  "192.168.100.105",
-  "192.168.100.106",
-]
-
-storage = {
-  count  = 3
-  cpu    = 8
-  memory = 32768
-  disk   = 128
-}
-
-storage_hostnames = [
-  "storage01",
-  "storage02",
-  "storage03",
-]
-
-storage_ips = [
-  "192.168.100.108",
-  "192.168.100.109",
-  "192.168.100.110",
-]
+use_lb_coredns = true
+storage_count = 3
+storage_ip_addresses = ["192.168.100.87", "192.168.100.88", "192.168.100.89"]

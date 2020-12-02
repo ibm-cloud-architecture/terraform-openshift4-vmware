@@ -1,0 +1,22 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: ibm:post-deployment
+  namespace: ibm-post-deployment
+rules:
+- apiGroups: 
+  - certificates.k8s.io
+  resources:
+    - certificatesigningrequests
+    - certificatesigningrequests/approval
+  verbs:
+    - get
+    - list
+    - update
+- apiGroups:
+  - certificates.k8s.io
+  resources:
+    - signers
+  verbs:
+    - approve

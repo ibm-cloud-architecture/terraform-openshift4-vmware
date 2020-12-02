@@ -1,15 +1,66 @@
-provider "vsphere" {
-  user                 = var.vsphere_username
-  password             = var.vsphere_password
-  vsphere_server       = var.vsphere_server
-  allow_unverified_ssl = var.vsphere_allow_insecure
-}
+# force local ignition provider binary
+# provider "ignition" {
+#   version = "0.0.0"
+# }
 
 locals {
-  resource_pool_id = var.preexisting_resource_pool ? data.vsphere_resource_pool.pool[0].id : vsphere_resource_pool.pool[0].id
+  cluster_domain      = "${var.cluster_id}.${var.base_domain}"
+  bootstrap_fqdns     = ["bootstrap-0.${local.cluster_domain}"]
+  lb_fqdns            = ["lb-0.${local.cluster_domain}"]
+  api_lb_fqdns        = formatlist("%s.%s", ["api", "api-int", "*.apps"], local.cluster_domain)
+  control_plane_fqdns = [for idx in range(var.control_plane_count) : "control-plane-${idx}.${local.cluster_domain}"]
+  compute_fqdns       = [for idx in range(var.compute_count) : "compute-${idx}.${local.cluster_domain}"]
+  storage_fqdns       = [for idx in range(var.storage_count) : "storage-${idx}.${local.cluster_domain}"]
 }
 
-# SSH Key for VMs
+provider "vsphere" {
+  user                 = var.vsphere_user
+  password             = var.vsphere_password
+  vsphere_server       = var.vsphere_server
+  allow_unverified_ssl = true
+}
+
+data "vsphere_datacenter" "dc" {
+  name = var.vsphere_datacenter
+}
+
+data "vsphere_compute_cluster" "compute_cluster" {
+  name          = var.vsphere_cluster
+  datacenter_id = data.vsphere_datacenter.dc.id
+}
+
+data "vsphere_datastore" "datastore" {
+  name          = var.vsphere_datastore
+  datacenter_id = data.vsphere_datacenter.dc.id
+}
+
+data "vsphere_network" "network" {
+  name          = var.vm_network
+  datacenter_id = data.vsphere_datacenter.dc.id
+}
+
+data "vsphere_network" "loadbalancer_network" {
+  count         = var.loadbalancer_network == "" ? 0 : 1
+  name          = var.loadbalancer_network
+  datacenter_id = data.vsphere_datacenter.dc.id
+}
+
+data "vsphere_virtual_machine" "template" {
+  name          = var.vm_template
+  datacenter_id = data.vsphere_datacenter.dc.id
+}
+
+resource "vsphere_resource_pool" "resource_pool" {
+  name                    = var.cluster_id
+  parent_resource_pool_id = data.vsphere_compute_cluster.compute_cluster.resource_pool_id
+}
+
+resource "vsphere_folder" "folder" {
+  path          = var.cluster_id
+  type          = "vm"
+  datacenter_id = data.vsphere_datacenter.dc.id
+}
+
 resource "tls_private_key" "installkey" {
   algorithm = "RSA"
   rsa_bits  = 4096
@@ -27,216 +78,183 @@ resource "local_file" "write_public_key" {
   file_permission = 0600
 }
 
-module "helper" {
-  source             = "./helper"
-  datacenter_id      = data.vsphere_datacenter.datacenter.id
-  datastore_id       = data.vsphere_datastore.node.id
-  resource_pool_id   = local.resource_pool_id
-  folder_id          = vsphere_folder.folder.path
-  vminfo             = var.helper
-  public_ip          = var.helper_public_ip
-  private_ip         = var.helper_private_ip
-  public_network_id  = data.vsphere_network.public.id
-  private_network_id = data.vsphere_network.private.id
-  public_gateway     = var.public_network_gateway
-  private_gateway    = var.private_network_gateway
-  public_netmask     = var.public_network_netmask
-  private_netmask    = var.private_network_netmask
-  cluster_id         = var.openshift_cluster_id
-  base_domain        = var.openshift_base_domain
-  dns_servers        = var.public_network_nameservers
-  ssh_private_key    = tls_private_key.installkey.private_key_pem
-  ssh_public_key     = tls_private_key.installkey.public_key_openssh
-  bootstrap_hostname = var.bootstrap_hostname
-  bootstrap_ip       = var.bootstrap_ip
-  master_hostnames   = var.master_hostnames
-  master_ips         = var.master_ips
-  worker_hostnames   = var.worker_hostnames
-  worker_ips         = var.worker_ips
-  storage_hostnames  = var.storage_hostnames
-  storage_ips        = var.storage_ips
-  binaries           = var.binaries
-}
+module "lb" {
+  count = var.create_loadbalancer_vm ? 1 : 0
+  source        = "./lb"
+  lb_ip_address = var.lb_ip_address
 
-module "createisos" {
-  source = "./createisos"
-  dependson = [
-    module.helper.module_completed
-  ]
-  binaries              = var.binaries
-  bootstrap             = var.bootstrap
-  bootstrap_hostname    = var.bootstrap_hostname
-  bootstrap_ip          = var.bootstrap_ip
-  master                = var.master
-  master_hostnames      = var.master_hostnames
-  master_ips            = var.master_ips
-  worker                = var.worker
-  worker_hostnames      = var.worker_hostnames
-  worker_ips            = var.worker_ips
-  storage               = var.storage
-  storage_hostnames     = var.storage_hostnames
-  storage_ips           = var.storage_ips
-  helper                = var.helper
-  helper_public_ip      = var.helper_public_ip
-  helper_private_ip     = var.helper_private_ip
-  ssh_private_key       = tls_private_key.installkey.private_key_pem
-  network_device        = var.coreos_network_device
-  cluster_id            = var.openshift_cluster_id
-  base_domain           = var.openshift_base_domain
-  private_netmask       = var.private_network_netmask
-  private_gateway       = var.private_network_gateway
-  openshift_nameservers = var.use_helper_for_node_dns ? [var.helper_private_ip] : var.public_network_nameservers
+  api_backend_addresses = flatten([
+    var.bootstrap_ip_address,
+    var.control_plane_ip_addresses
+  ])
 
-  vsphere_server               = var.vsphere_server
-  vsphere_username             = var.vsphere_username
-  vsphere_password             = var.vsphere_password
-  vsphere_allow_insecure       = var.vsphere_allow_insecure
-  vsphere_image_datastore      = var.vsphere_image_datastore
-  vsphere_image_datastore_path = var.vsphere_image_datastore_path
+  ingress_backend_addresses = var.compute_ip_addresses
+  ssh_public_key            = chomp(tls_private_key.installkey.public_key_openssh)
+
+  cluster_domain = local.cluster_domain
+
+  bootstrap_ip      = var.bootstrap_ip_address
+  control_plane_ips = var.control_plane_ip_addresses
+  vm_dns_addresses  = var.vm_dns_addresses
+
+  dns_ip_addresses = zipmap(
+    concat(
+      local.bootstrap_fqdns,
+      local.api_lb_fqdns,
+      local.control_plane_fqdns,
+      local.compute_fqdns,
+      local.storage_fqdns
+    ),
+    concat(
+      list(var.bootstrap_ip_address),
+      [for idx in range(length(local.api_lb_fqdns)) : var.lb_ip_address],
+      var.control_plane_ip_addresses,
+      var.compute_ip_addresses,
+      var.storage_ip_addresses
+    ),
+  )
+
+  loadbalancer_ip   = var.loadbalancer_lb_ip_address
+  loadbalancer_cidr = var.loadbalancer_lb_machine_cidr
+
+  hostnames_ip_addresses  = zipmap(local.lb_fqdns, [var.lb_ip_address])
+  machine_cidr            = var.machine_cidr
+  resource_pool_id        = vsphere_resource_pool.resource_pool.id
+  datastore_id            = data.vsphere_datastore.datastore.id
+  datacenter_id           = data.vsphere_datacenter.dc.id
+  network_id              = data.vsphere_network.network.id
+  loadbalancer_network_id = var.loadbalancer_network == "" ? "" : data.vsphere_network.loadbalancer_network[0].id
+  folder_id               = vsphere_folder.folder.path
+  guest_id                = data.vsphere_virtual_machine.template.guest_id
+  template_uuid           = data.vsphere_virtual_machine.template.id
+  disk_thin_provisioned   = data.vsphere_virtual_machine.template.disks[0].thin_provisioned
+
 }
 
 module "ignition" {
-  source = "./ignition"
-  dependson = [
-    module.createisos.module_completed
-  ]
-  helper              = var.helper
-  helper_public_ip    = var.helper_public_ip
-  ssh_private_key     = tls_private_key.installkey.private_key_pem
-  ssh_public_key      = tls_private_key.installkey.public_key_openssh
-  binaries            = var.binaries
-  base_domain         = var.openshift_base_domain
-  master              = var.master
-  worker              = var.worker
-  storage             = var.storage
-  cluster_id          = var.openshift_cluster_id
+  source              = "./ignition"
+  ssh_public_key      = chomp(tls_private_key.installkey.public_key_openssh)
+  base_domain         = var.base_domain
+  cluster_id          = var.cluster_id
   cluster_cidr        = var.openshift_cluster_cidr
   cluster_hostprefix  = var.openshift_host_prefix
   cluster_servicecidr = var.openshift_service_cidr
+  machine_cidr        = var.machine_cidr
   vsphere_server      = var.vsphere_server
-  vsphere_username    = var.vsphere_username
+  vsphere_username    = var.vsphere_user
   vsphere_password    = var.vsphere_password
   vsphere_datacenter  = var.vsphere_datacenter
-  vsphere_datastore   = var.vsphere_node_datastore
+  vsphere_datastore   = var.vsphere_datastore
   pull_secret         = var.openshift_pull_secret
+  openshift_version   = var.openshift_version
+  total_node_count    = var.compute_count + var.storage_count
 }
 
 module "bootstrap" {
-  source = "./bootstrap"
-  dependson = [
-    module.createisos.module_completed,
-    module.ignition.module_completed
-  ]
-  vminfo               = var.bootstrap
-  resource_pool_id     = local.resource_pool_id
-  datastore_id         = data.vsphere_datastore.node.id
-  image_datastore_id   = data.vsphere_datastore.images.id
-  image_datastore_path = var.vsphere_image_datastore_path
-  folder               = vsphere_folder.folder.path
-  cluster_id           = var.openshift_cluster_id
-  network_id           = data.vsphere_network.private.id
-  helper               = var.helper
-  helper_public_ip     = var.helper_public_ip
-  ssh_private_key      = tls_private_key.installkey.private_key_pem
+  source = "./vm"
+
+  ignition = module.ignition.bootstrap_ignition
+
+  hostnames_ip_addresses = zipmap(
+    local.bootstrap_fqdns,
+    [var.bootstrap_ip_address]
+  )
+
+  resource_pool_id      = vsphere_resource_pool.resource_pool.id
+  datastore_id          = data.vsphere_datastore.datastore.id
+  datacenter_id         = data.vsphere_datacenter.dc.id
+  network_id            = data.vsphere_network.network.id
+  folder_id             = vsphere_folder.folder.path
+  guest_id              = data.vsphere_virtual_machine.template.guest_id
+  template_uuid         = data.vsphere_virtual_machine.template.id
+  disk_thin_provisioned = data.vsphere_virtual_machine.template.disks[0].thin_provisioned
+
+  cluster_domain = local.cluster_domain
+  machine_cidr   = var.machine_cidr
+
+  num_cpus      = 2
+  memory        = 8192
+  dns_addresses = var.create_loadbalancer_vm ? [var.lb_ip_address] : var.vm_dns_addresses
 }
 
-module "master" {
-  source = "./nodes"
-  dependson = [
-    module.createisos.module_completed,
-    module.ignition.module_completed,
-    module.bootstrap.module_completed,
-  ]
-  vminfo               = var.master
-  vmtype               = "master"
-  resource_pool_id     = local.resource_pool_id
-  datastore_id         = data.vsphere_datastore.node.id
-  image_datastore_id   = data.vsphere_datastore.images.id
-  image_datastore_path = var.vsphere_image_datastore_path
-  folder               = vsphere_folder.folder.path
-  cluster_id           = var.openshift_cluster_id
-  network_id           = data.vsphere_network.private.id
-  helper               = var.helper
-  helper_public_ip     = var.helper_public_ip
-  ssh_private_key      = tls_private_key.installkey.private_key_pem
+module "control_plane_vm" {
+  source = "./vm"
+
+  hostnames_ip_addresses = zipmap(
+    local.control_plane_fqdns,
+    var.control_plane_ip_addresses
+  )
+
+  ignition = module.ignition.master_ignition
+
+  resource_pool_id      = vsphere_resource_pool.resource_pool.id
+  datastore_id          = data.vsphere_datastore.datastore.id
+  datacenter_id         = data.vsphere_datacenter.dc.id
+  network_id            = data.vsphere_network.network.id
+  folder_id             = vsphere_folder.folder.path
+  guest_id              = data.vsphere_virtual_machine.template.guest_id
+  template_uuid         = data.vsphere_virtual_machine.template.id
+  disk_thin_provisioned = data.vsphere_virtual_machine.template.disks[0].thin_provisioned
+
+  cluster_domain = local.cluster_domain
+  machine_cidr   = var.machine_cidr
+
+  num_cpus      = var.control_plane_num_cpus
+  memory        = var.control_plane_memory
+  dns_addresses = var.create_loadbalancer_vm ? [var.lb_ip_address] : var.vm_dns_addresses
 }
 
-module "worker" {
-  source = "./nodes"
-  dependson = [
-    module.createisos.module_completed,
-    module.ignition.module_completed,
-    module.bootstrap.module_completed,
-    #    module.master.module_completed,
-  ]
-  vminfo               = var.worker
-  vmtype               = "worker"
-  resource_pool_id     = local.resource_pool_id
-  datastore_id         = data.vsphere_datastore.node.id
-  image_datastore_id   = data.vsphere_datastore.images.id
-  image_datastore_path = var.vsphere_image_datastore_path
-  folder               = vsphere_folder.folder.path
-  cluster_id           = var.openshift_cluster_id
-  network_id           = data.vsphere_network.private.id
-  helper               = var.helper
-  helper_public_ip     = var.helper_public_ip
-  ssh_private_key      = tls_private_key.installkey.private_key_pem
+module "compute_vm" {
+  source = "./vm"
+
+  hostnames_ip_addresses = zipmap(
+    local.compute_fqdns,
+    var.compute_ip_addresses
+  )
+
+  ignition = module.ignition.worker_ignition
+
+  resource_pool_id      = vsphere_resource_pool.resource_pool.id
+  datastore_id          = data.vsphere_datastore.datastore.id
+  datacenter_id         = data.vsphere_datacenter.dc.id
+  network_id            = data.vsphere_network.network.id
+  folder_id             = vsphere_folder.folder.path
+  guest_id              = data.vsphere_virtual_machine.template.guest_id
+  template_uuid         = data.vsphere_virtual_machine.template.id
+  disk_thin_provisioned = data.vsphere_virtual_machine.template.disks[0].thin_provisioned
+
+  cluster_domain = local.cluster_domain
+  machine_cidr   = var.machine_cidr
+
+  num_cpus      = var.compute_num_cpus
+  memory        = var.compute_memory
+  dns_addresses = var.create_loadbalancer_vm ? [var.lb_ip_address] : var.vm_dns_addresses
 }
 
-module "storage" {
-  source = "./nodes"
-  dependson = [
-    module.createisos.module_completed,
-    module.ignition.module_completed,
-    module.bootstrap.module_completed,
-    #    module.master.module_completed,
-  ]
-  vminfo               = var.storage
-  vmtype               = "storage"
-  resource_pool_id     = local.resource_pool_id
-  datastore_id         = data.vsphere_datastore.node.id
-  image_datastore_id   = data.vsphere_datastore.images.id
-  image_datastore_path = var.vsphere_image_datastore_path
-  folder               = vsphere_folder.folder.path
-  cluster_id           = var.openshift_cluster_id
-  network_id           = data.vsphere_network.private.id
-  helper               = var.helper
-  helper_public_ip     = var.helper_public_ip
-  ssh_private_key      = tls_private_key.installkey.private_key_pem
+module "storage_vm" {
+  source = "./vm"
+
+  hostnames_ip_addresses = zipmap(
+    local.storage_fqdns,
+    var.storage_ip_addresses
+  )
+
+  ignition = module.ignition.worker_ignition
+
+  resource_pool_id      = vsphere_resource_pool.resource_pool.id
+  datastore_id          = data.vsphere_datastore.datastore.id
+  datacenter_id         = data.vsphere_datacenter.dc.id
+  network_id            = data.vsphere_network.network.id
+  folder_id             = vsphere_folder.folder.path
+  guest_id              = data.vsphere_virtual_machine.template.guest_id
+  template_uuid         = data.vsphere_virtual_machine.template.id
+  disk_thin_provisioned = data.vsphere_virtual_machine.template.disks[0].thin_provisioned
+
+  cluster_domain = local.cluster_domain
+  machine_cidr   = var.machine_cidr
+
+  num_cpus      = var.storage_num_cpus
+  memory        = var.storage_memory
+  dns_addresses = var.create_loadbalancer_vm ? [var.lb_ip_address] : var.vm_dns_addresses
 }
 
-module "deploy" {
-  dependson = [
-    module.createisos.module_completed,
-    module.ignition.module_completed,
-    module.master.module_completed,
-    module.worker.module_completed,
-    module.storage.module_completed
-  ]
-  source            = "./deploy"
-  helper            = var.helper
-  helper_public_ip  = var.helper_public_ip
-  ssh_private_key   = tls_private_key.installkey.private_key_pem
-  storage           = var.storage
-  storage_hostnames = var.storage_hostnames
-  cluster_id        = var.openshift_cluster_id
-  base_domain       = var.openshift_base_domain
-}
-
-resource "vsphere_folder" "folder" {
-  path          = var.openshift_cluster_id
-  type          = "vm"
-  datacenter_id = data.vsphere_datacenter.datacenter.id
-}
-
-resource "vsphere_resource_pool" "pool" {
-  count                   = var.preexisting_resource_pool ? 0 : 1
-  name                    = var.openshift_cluster_id
-  parent_resource_pool_id = data.vsphere_compute_cluster.cluster.resource_pool_id
-}
-
-data "vsphere_resource_pool" "pool" {
-  count         = var.preexisting_resource_pool ? 1 : 0
-  name          = "/${var.vsphere_datacenter}/host/${var.vsphere_cluster}/Resources/${var.vsphere_resource_pool}"
-  datacenter_id = data.vsphere_datacenter.datacenter.id
-}

@@ -1,0 +1,29 @@
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: approve-csrs
+  namespace: ibm-post-deployment
+spec:
+  containers:
+  - name: csr-approve
+    imagePullPolicy: Always
+    image: quay.io/openshift/origin-cli:latest
+    command: ["/bin/sh", "-c"]
+    args: 
+      - "mkdir /tmp/csrs-rw && cp /tmp/csrs/*.sh /tmp/csrs-rw && cd /tmp/csrs-rw && ./approve-csrs.sh --wait-count 60 --nodes ${node_count}"
+    volumeMounts:
+      - name: approve-csrs
+        mountPath: /tmp/csrs
+  restartPolicy: Never
+  serviceAccount: ibm-deployment-sa
+  volumes:
+    - name: approve-csrs
+      secret:
+        defaultMode: 0755
+        secretName: approve-csrs-scripts
+  tolerations:
+    - operator: Exists
+  nodeSelector:
+    node-role.kubernetes.io/master: ''
