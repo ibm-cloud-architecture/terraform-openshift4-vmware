@@ -1,6 +1,20 @@
-# terraform-openshift4-vmware
+# OpenShift 4.6 UPI Deployment with Static IPs
 
-Deploy OpenShift 4.6 and later using static IP addresses for master and worker nodes. 
+Deploy OpenShift 4.6 and later using static IP addresses for CoreOS nodes. The `ignition` module will inject code into the cluster that will automatically approve all node CSRs.  This runs only once at cluster creation.  You can delete the `ibm-post-deployment` namespace once your cluster is up and running.
+
+**NOTE**: This requires OpenShift 4.6 or later to deploy, if you're looking for 4.5 or earlier, take a look at the `pre-4.6` branch
+
+**NOTE**: Requires terraform 0.13 or later.
+
+
+
+## Architecture
+
+OpenShift 4.6 User-Provided Infrastructure
+
+
+
+![](./media/topology.png	)
 
 ## Prereqs
 
@@ -9,6 +23,7 @@ Deploy OpenShift 4.6 and later using static IP addresses for master and worker n
       - api.`cluster_id`.`base_domain`
       - *.apps.`cluster_id`.`base_domain`
     - Point both of those DNS A or CNAME records to either your LoadBalancers or the public IP address of the CoreOS LoadBalancer VM
+2. [CoreOS OVA](http://mirror.openshift.com/pub/openshift-v4/dependencies/rhcos/) must be uploaded to vCenter as a template.
 
 ## Installation Process
 
@@ -36,7 +51,7 @@ $ terraform apply
 | vsphere_datacenter           | vSphere Datacenter where OpenShift will be deployed          | string | - |
 | vsphere_cluster              | vSphere Cluster where OpenShift will be deployed             | string | - |
 | vsphere_datastore       | vSphere Datastore for OpenShift nodes                        | string | - |
-| vm_template | This is the name of the VM template to clone.                | string | - |
+| vm_template | Name of CoreOS OVA template from prereq #2 | string | - |
 | vm_network | vSphere Network for OpenShift nodes                   | string | - |
 | loadbalancer_network       | vSphere Network for Loadbalancer/DNS VM                      | string | -                              |
 | vm_dns_addresses           | List of DNS servers to use for your OpenShift Nodes          | list   | 8.8.8.8, 8.8.4.4               |

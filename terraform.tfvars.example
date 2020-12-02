@@ -41,12 +41,6 @@ control_plane_count = 3
 // The number of compute VMs to create. Default is 3.
 compute_count = 3
 
-// Ignition config path for the control plane machines
-control_plane_ignition_path = "./master.ign"
-
-// Ignition config path for the compute machines
-compute_ignition_path = "./worker.ign"
-
 // Set bootstrap_ip, control_plane_ip, and compute_ip if you want to use static
 // IPs reserved someone else, rather than the IPAM server.
 
@@ -71,6 +65,6 @@ loadbalancer_lb_machine_cidr = "9.42.67.128/25"
 vm_dns_addresses = ["9.42.106.2", "9.42.106.3"]
 
 openshift_pull_secret = "~/.pull-secret"
-use_lb_coredns = true
+create_loadbalancer_vm = true
 storage_count = 3
 storage_ip_addresses = ["192.168.100.87", "192.168.100.88", "192.168.100.89"]
