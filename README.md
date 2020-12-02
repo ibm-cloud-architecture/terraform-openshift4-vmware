@@ -6,9 +6,9 @@ Deploy OpenShift 4.6 and later using static IP addresses for master and worker n
 
 1. [DNS](https://docs.openshift.com/container-platform/4.3/installing/installing_vsphere/installing-vsphere.html#installation-dns-user-infra_installing-vsphere) needs to be configured ahead of time
     - If you're using the helper vm for internal DNS, the only external DNS entries required are:
-      - api.cluster_id.domain.com
-      - *.apps.cluster_id.domain.com
-    - Point both of those DNS A or CNAME records to the public IP address of the helper vm.
+      - api.`cluster_id`.`base_domain`
+      - *.apps.`cluster_id`.`base_domain`
+    - Point both of those DNS A or CNAME records to either your LoadBalancers or the public IP address of the CoreOS LoadBalancer VM
 
 ## Installation Process
 
