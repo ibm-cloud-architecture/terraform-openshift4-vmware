@@ -14,7 +14,7 @@ OpenShift 4.6 User-Provided Infrastructure
 
 ## Prereqs
 
-1. [DNS](https://docs.openshift.com/container-platform/4.3/installing/installing_vsphere/installing-vsphere.html#installation-dns-user-infra_installing-vsphere) needs to be configured ahead of time
+1. [DNS](https://docs.openshift.com/container-platform/4.6/installing/installing_vsphere/installing-vsphere.html#installation-dns-user-infra_installing-vsphere) needs to be configured ahead of time
     - If you're using the helper vm for internal DNS, the only external DNS entries required are:
       - api.`cluster_id`.`base_domain`
       - *.apps.`cluster_id`.`base_domain`
