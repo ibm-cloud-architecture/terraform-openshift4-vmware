@@ -2,19 +2,15 @@
 
 Deploy OpenShift 4.6 and later using static IP addresses for CoreOS nodes. The `ignition` module will inject code into the cluster that will automatically approve all node CSRs.  This runs only once at cluster creation.  You can delete the `ibm-post-deployment` namespace once your cluster is up and running.
 
-**NOTE**: This requires OpenShift 4.6 or later to deploy, if you're looking for 4.5 or earlier, take a look at the `pre-4.6` [branch](https://github.com/ncolon/terraform-openshift4-vmware/tree/4.6-release)
+**NOTE**: This requires OpenShift 4.6 or later to deploy, if you're looking for 4.5 or earlier, take a look at the `pre-4.6` [branch](https://github.com/ibm-cloud-architecture/terraform-openshift4-vmware/tree/4.6-release)
 
 **NOTE**: Requires terraform 0.13 or later.
-
-
 
 ## Architecture
 
 OpenShift 4.6 User-Provided Infrastructure
 
-
-
-![](./media/topology.png	)
+![topology](./media/topology.png)
 
 ## Prereqs
 
@@ -25,25 +21,20 @@ OpenShift 4.6 User-Provided Infrastructure
     - Point both of those DNS A or CNAME records to either your LoadBalancers or the public IP address of the CoreOS LoadBalancer VM
 2. [CoreOS OVA](http://mirror.openshift.com/pub/openshift-v4/dependencies/rhcos/) must be uploaded to vCenter as a template.
 
-
-
 ## Installation Process
 
 ```bash
-$ git clone https://github.com/ncolon/terraform-openshift4-vmware
-$ cd terraform-openshift4-vmware
+git clone https://github.com/ibm-cloud-architecture/terraform-openshift4-vmware
+cd terraform-openshift4-vmware
 ```
 
 Update your `terraform.tfvars` with your environment values.  See `terraform.tfvars.example`
 
-
 ```bash
-$ terraform init
-$ terraform plan
-$ terraform apply
+terraform init
+terraform plan
+terraform apply
 ```
-
-
 
 ## terraform variables
 
@@ -78,7 +69,7 @@ $ terraform apply
 | lb_ip_address                | IP Address for LoadBalancer VM on same subnet as `machine_cidr` | string | -                |
 | loadbalancer_lb_ip_address   | IP Address for LoadBalancer VM for secondary NIC on same subnet as `loadbalancer_lb_machine_cidr` | string | -                |
 | loadbalancer_lb_machine_cidr | CIDR for your LoadBalancer CoreOS VMs in `subnet/mask` format | string | -                |
-| openshift_pull_secret        | Path to your OpenShift pull secret.  Download from https://cloud.redhat.com/openshift/install/vsphere/user-provisioned | string | -                |
+| openshift_pull_secret        | Path to your OpenShift [pull secret](https://cloud.redhat.com/openshift/install/vsphere/user-provisioned) | string | -                |
 | openshift_cluster_cidr       | CIDR for pods in the OpenShift SDN                           | string | 10.128.0.0/14    |
 | openshift_service_cidr       | CIDR for services in the OpenShift SDN                       | string | 172.30.0.0/16    |
 | openshift_host_prefix        | Controls the number of pods to allocate to each node from the `openshift_cluster_cidr` CIDR. For example, 23 would allocate 2^(32-23) 512 pods to each node. | string | 23               |
