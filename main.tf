@@ -32,11 +32,11 @@ resource "vcd_vapp_org_network" "vappOrgNet" {
 
  # Comment below line to create an isolated vApp network
   org_network_name  = var.vm_network
-  depends_on = [vcd_vapp.var.app_name]
+  depends_on = [vcd_vapp.app_name]
 }
 
 
-resource "vcd_vapp" "var.app_name" {
+resource "vcd_vapp" "app_name" {
   org          = var.vcd_org
   vdc          = var.vcd_vdc
 
