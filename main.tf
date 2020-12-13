@@ -28,7 +28,7 @@ resource "vcd_vapp_org_network" "vappOrgNet" {
   org          = var.vcd_org
   vdc          = var.vcd_vdc
 
-  vapp_name         = var.app_name
+  vapp_name         = app_name
 
  # Comment below line to create an isolated vApp network
   org_network_name  = var.vm_network
@@ -40,7 +40,7 @@ resource "vcd_vapp" "app_name" {
   org          = var.vcd_org
   vdc          = var.vcd_vdc
 
-  name = var.app_name
+  name = app_name
 
 }
 #

@@ -1,6 +1,35 @@
 //////
 // vSphere variables
 //////
+variable "vsphere_server" {
+  type        = string
+  description = "This is the vSphere server for the environment."
+}
+
+variable "vsphere_user" {
+  type        = string
+  description = "vSphere server user for the environment."
+}
+
+variable "vsphere_password" {
+  type        = string
+  description = "vSphere server password"
+}
+
+variable "vsphere_cluster" {
+  type        = string
+  description = "This is the name of the vSphere cluster."
+}
+
+variable "vsphere_datacenter" {
+  type        = string
+  description = "This is the name of the vSphere data center."
+}
+
+variable "vsphere_datastore" {
+  type        = string
+  description = "This is the name of the vSphere data store."
+}
 
 variable "vcd_vdc" {
   type        = string
