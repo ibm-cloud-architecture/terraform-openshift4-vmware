@@ -24,20 +24,20 @@ terraform {
 }
 
 provider "vcd" {
-  user                 = "var.vcd_user"
-  password             = "var.vcd_password"
-  org                  = "var.vcd_org"
-  url                  = "var.vcd_url"
+  user                 = var.vcd_user
+  password             = var.vcd_password
+  org                  = var.vcd_org
+  url                  = var.vcd_url
   max_retry_timeout    = 30
   allow_unverified_ssl = true
   logging              = true
 }
 
 resource "vcd_vapp_org_network" "vappOrgNet" {
-  org          = "var.vcd_org"
-  vdc          = "var.vcd_vdc"
+  org          = var.vcd_org
+  vdc          = var.vcd_vdc
 
-  vapp_name         = "var.app_name"
+  vapp_name         = var.app_name
 
  # Comment below line to create an isolated vApp network
   org_network_name  = "var.vm_network"
@@ -46,10 +46,10 @@ resource "vcd_vapp_org_network" "vappOrgNet" {
 
 
 resource "vcd_vapp" "var.app_name" {
-  org          = "var.vcd_org"
-  vdc          = "var.vcd_vdc"
+  org          = var.vcd_org
+  vdc          = var.vcd_vdc
 
-  name = "var.app_name"
+  name = var.app_name
 
 }
 #
