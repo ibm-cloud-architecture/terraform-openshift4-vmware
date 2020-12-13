@@ -4,7 +4,6 @@
 # }
 
 locals {
-  app_name           = "${var.cluster_id}-${var.base_domain}"
   cluster_domain      = "${var.cluster_id}.${var.base_domain}"
   bootstrap_fqdns     = ["bootstrap-0.${local.cluster_domain}"]
   lb_fqdns            = ["lb-0.${local.cluster_domain}"]
@@ -13,94 +12,54 @@ locals {
   compute_fqdns       = [for idx in range(var.compute_count) : "compute-${idx}.${local.cluster_domain}"]
   storage_fqdns       = [for idx in range(var.storage_count) : "storage-${idx}.${local.cluster_domain}"]
 }
-# This section pulls down the current version of the vcd provider
-terraform {
-  required_providers {
-    vcd = {
-      source = "vmware/vcd"
-    }
-  }
-  required_version = ">= 0.13"
-}
 
-provider "vcd" {
-  user                 = "var.vcd_user"
-  password             = "var.vcd_password"
-  org                  = "var.vcd_org"
-  url                  = "var.vcd_url"
-  max_retry_timeout    = 30
+provider "vsphere" {
+  user                 = var.vsphere_user
+  password             = var.vsphere_password
+  vsphere_server       = var.vsphere_server
   allow_unverified_ssl = true
-  logging              = true
 }
 
-resource "vcd_vapp_org_network" "vappOrgNet" {
-  org          = "var.vcd_org"
-  vdc          = "var.vcd_vdc"
-
-  vapp_name         = "var.app_name"
-
- # Comment below line to create an isolated vApp network
-  org_network_name  = "var.vm_network"
-  depends_on = [vcd_vapp.var.app_name]
+data "vsphere_datacenter" "dc" {
+  name = var.vsphere_datacenter
 }
 
-
-resource "vcd_vapp" "var.app_name" {
-  org          = "var.vcd_org"
-  vdc          = "var.vcd_vdc"
-
-  name = "var.app_name"
-
+data "vsphere_compute_cluster" "compute_cluster" {
+  name          = var.vsphere_cluster
+  datacenter_id = data.vsphere_datacenter.dc.id
 }
-#
 
-#provider "vsphere" {
-#  user                 = var.vsphere_user
-#  password             = var.vsphere_password
-#  vsphere_server       = var.vsphere_server
-#  allow_unverified_ssl = true
-#}
+data "vsphere_datastore" "datastore" {
+  name          = var.vsphere_datastore
+  datacenter_id = data.vsphere_datacenter.dc.id
+}
 
-#data "vsphere_datacenter" "dc" {
-#  name = var.vsphere_datacenter
-#}
+data "vsphere_network" "network" {
+  name          = var.vm_network
+  datacenter_id = data.vsphere_datacenter.dc.id
+}
 
-#data "vsphere_compute_cluster" "compute_cluster" {
-#  name          = var.vsphere_cluster
-#  datacenter_id = data.vsphere_datacenter.dc.id
-#}
+data "vsphere_network" "loadbalancer_network" {
+  count         = var.loadbalancer_network == "" ? 0 : 1
+  name          = var.loadbalancer_network
+  datacenter_id = data.vsphere_datacenter.dc.id
+}
 
-#data "vsphere_datastore" "datastore" {
-#  name          = var.vsphere_datastore
-#  datacenter_id = data.vsphere_datacenter.dc.id
-#}
+data "vsphere_virtual_machine" "template" {
+  name          = var.vm_template
+  datacenter_id = data.vsphere_datacenter.dc.id
+}
 
-#data "vsphere_network" "network" {
-#  name          = var.vm_network
-#  datacenter_id = data.vsphere_datacenter.dc.id
-#}
+resource "vsphere_resource_pool" "resource_pool" {
+  name                    = var.cluster_id
+  parent_resource_pool_id = data.vsphere_compute_cluster.compute_cluster.resource_pool_id
+}
 
-#data "vsphere_network" "loadbalancer_network" {
-#  count         = var.loadbalancer_network == "" ? 0 : 1
-#  name          = var.loadbalancer_network
-#  datacenter_id = data.vsphere_datacenter.dc.id
-#}
-
-#data "vsphere_virtual_machine" "template" {
-#  name          = var.vm_template
-#  datacenter_id = data.vsphere_datacenter.dc.id
-#}
-
-#resource "vsphere_resource_pool" "resource_pool" {
-#  name                    = var.cluster_id
-#  parent_resource_pool_id = data.vsphere_compute_cluster.compute_cluster.resource_pool_id
-#}
-
-#resource "vsphere_folder" "folder" {
-#  path          = var.cluster_id
-#  type          = "vm"
-#  datacenter_id = data.vsphere_datacenter.dc.id
-#}
+resource "vsphere_folder" "folder" {
+  path          = var.cluster_id
+  type          = "vm"
+  datacenter_id = data.vsphere_datacenter.dc.id
+}
 
 resource "tls_private_key" "installkey" {
   algorithm = "RSA"
@@ -298,3 +257,4 @@ module "storage_vm" {
   memory        = var.storage_memory
   dns_addresses = var.create_loadbalancer_vm ? [var.lb_ip_address] : var.vm_dns_addresses
 }
+

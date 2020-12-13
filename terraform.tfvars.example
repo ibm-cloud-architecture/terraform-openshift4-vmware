@@ -4,20 +4,20 @@ cluster_id = "upi46"
 // Base domain from which the cluster domain is a subdomain.
 base_domain = "ncolon.xyz"
 
-// Name of the vSphere server. The dev cluster is on "vcsa.vmware.devcluster.openshift.com".
-vsphere_server = "vcsa67.rtp.raleigh.ibm.com"
+// Name of the VDC.
+vcd_vdc = "myVDC"
 
 // User on the vSphere server.
-vsphere_user = "administrator@vsphere.local"
+vcd_user = "administrator@vsphere.local"
 
 // Password of the user on the vSphere server.
-vsphere_password = "MySecretPa55w0rd"
+vcd_password = "MySecretPa55w0rd"
 
-// Name of the vSphere cluster. The dev cluster is "devel".
-vsphere_cluster = "cluster01"
+// Name of the VCD organization. Found on the VCD console, Data Centers tab
+vcd_org = "really-long-alfa-num-string"
 
-// Name of the vSphere data center. The dev cluster is "dc1".
-vsphere_datacenter = "dc01"
+// url for the vcd.
+vcd_url = "daldir01.vmware-solutions.cloud.ibm.com"
 
 // Name of the vSphere data store to use for the VMs. The dev cluster uses "nvme-ds1".
 vsphere_datastore = "openshift"
@@ -25,14 +25,17 @@ vsphere_datastore = "openshift"
 // Name of the RHCOS VM template to clone to create VMs for the cluster
 vm_template = "rhcos-4.6-template"
 
+// Name of the vcd Catalog
+vcd_catalog = "Public Catalog"
+
 // Name of the VM Network for your cluster nodes
-vm_network = "vdpg-192.168.100"
+vm_network = "ocpnet"
 
 // Name of the VM Network for loadbalancer NIC in loadbalancer.
 loadbalancer_network = "vDPortGroup"
 
 // The machine_cidr where IP addresses will be assigned for cluster nodes.
-// Additionally, IPAM will assign IPs based on the network ID. 
+// Additionally, IPAM will assign IPs based on the network ID.
 machine_cidr = "192.168.100.0/24"
 
 // The number of control plane VMs to create. Default is 3.
