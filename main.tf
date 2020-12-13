@@ -13,15 +13,6 @@ locals {
   compute_fqdns       = [for idx in range(var.compute_count) : "compute-${idx}.${local.cluster_domain}"]
   storage_fqdns       = [for idx in range(var.storage_count) : "storage-${idx}.${local.cluster_domain}"]
 }
-# This section pulls down the current version of the vcd provider
-terraform {
-  required_providers {
-    vcd = {
-      source = "vmware/vcd"
-    }
-  }
-  required_version = ">= 0.13"
-}
 
 provider "vcd" {
   user                 = var.vcd_user
