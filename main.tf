@@ -157,8 +157,10 @@ module "lb" {
 #  loadbalancer_network_id = var.loadbalancer_network == "" ? "" : data.vsphere_network.loadbalancer_network[0].id
   loadbalancer_network_id = var.loadbalancer_network 
 #  folder_id               = vsphere_folder.folder.path
-  guest_id                = data.vsphere_virtual_machine.template.guest_id
-  template_uuid           = data.vsphere_virtual_machine.template.id
-  disk_thin_provisioned   = data.vsphere_virtual_machine.template.disks[0].thin_provisioned
-
+#  guest_id                = data.vsphere_virtual_machine.template.guest_id
+#  template_uuid           = data.vsphere_virtual_machine.template.id
+#  disk_thin_provisioned   = data.vsphere_virtual_machine.template.disks[0].thin_provisioned
+   vcd_catalog             = var.vcd_catalog
+   vm_template             = var.vm_template
+   app_name                = local.app_name
 }

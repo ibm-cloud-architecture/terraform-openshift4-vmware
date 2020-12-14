@@ -62,8 +62,8 @@ resource "vcd_vapp_vm" "vm" {
 #  nested_hv_enabled = var.nested_hv_enabled
   num_cpus         = var.num_cpus
   memory           = var.memory
-  guest_id         = var.guest_id
-  vapp_name= vcd_vapp.app_name
+#  guest_id         = var.guest_id
+  vapp_name= var.app_name
   catalog_name= var.vcd_catalog
   template_name=var.vm_template
   power_on= false
@@ -92,9 +92,9 @@ resource "vcd_vapp_vm" "vm" {
     }
   }
 
-  clone {
-    template_uuid = var.template_uuid
-  }
+#  clone {
+#    template_uuid = var.template_uuid
+#  }
 
   extra_config = {
     "guestinfo.ignition.config.data"          = base64encode(data.ignition_config.ignition.rendered)

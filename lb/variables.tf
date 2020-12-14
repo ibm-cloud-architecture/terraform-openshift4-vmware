@@ -1,3 +1,15 @@
+variable "app_name"    {
+  type=string
+}
+
+variable "vm_template" {
+  type = string
+}
+
+variable "vcd_catalog"  {
+  type = string
+}
+
 variable "lb_ip_address" {
   type = string
 }
@@ -59,17 +71,17 @@ variable "ignition" {
   default = ""
 }
 
-variable "disk_thin_provisioned" {
-  type = bool
-}
+#variable "disk_thin_provisioned" {
+#  type = bool
+#}
 
-variable "template_uuid" {
-  type = string
-}
+#variable "template_uuid" {
+#  type = string
+#}
 
-variable "guest_id" {
-  type = string
-}
+#variable "guest_id" {
+#  type = string
+#}
 
 #variable "resource_pool_id" {
 #  type = string
