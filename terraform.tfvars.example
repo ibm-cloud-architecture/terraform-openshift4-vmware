@@ -17,7 +17,7 @@ vcd_password = "MySecretPa55w0rd"
 vcd_org = "really-long-alfa-num-string"
 
 // url for the vcd.
-vcd_url = "daldir01.vmware-solutions.cloud.ibm.com"
+vcd_url = "https://daldir01.vmware-solutions.cloud.ibm.com/api"
 
 // Name of the vSphere data store to use for the VMs. The dev cluster uses "nvme-ds1".
 vsphere_datastore = "openshift"
