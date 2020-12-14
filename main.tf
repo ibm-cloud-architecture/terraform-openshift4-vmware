@@ -162,5 +162,6 @@ module "lb" {
 #  disk_thin_provisioned   = data.vsphere_virtual_machine.template.disks[0].thin_provisioned
    vcd_catalog             = var.vcd_catalog
    vm_template             = var.vm_template
+   num_cpus                = 2
    app_name                = local.app_name
 }

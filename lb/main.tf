@@ -50,36 +50,45 @@ data "template_file" "lb_ignition" {
   }
 }
 
-resource "vcd_vapp_vm" "vm" {
-  for_each = var.hostnames_ip_addresses
+resource "vcd_vapp_vm" "loadbalancer" {
 
-  name = element(split(".", each.key), 0)
+#  for_each = var.hostnames_ip_addresses
+#
+#  name = element(split(".", each.key), 0)
 
 #  resource_pool_id = var.resource_pool_id
 #  datastore_id     = var.datastore_id
 #  folder           = var.folder_id
 #  enable_disk_uuid = "true"
 #  nested_hv_enabled = var.nested_hv_enabled
-  num_cpus         = var.num_cpus
+  name             = "loadbalancer"
+  cpus             = var.num_cpus
   memory           = var.memory
 #  guest_id         = var.guest_id
   vapp_name= var.app_name
   catalog_name= var.vcd_catalog
   template_name=var.vm_template
   power_on= false
+  expose_hardware_virtualization = true
+
+#  wait_for_guest_net_timeout  = "0"
+#  wait_for_guest_net_routable = "false"
 
 
-  wait_for_guest_net_timeout  = "0"
-  wait_for_guest_net_routable = "false"
-
-
-
-  dynamic "network_interface" {
-    for_each = compact(concat(list(var.network_id, var.loadbalancer_network_id)))
-    content {
-      network_id = network_interface.value
-    }
+  network {
+    type               = "org"
+    name               = var.network_id
+    ip_allocation_mode = "STATIC"
+    is_primary         = true
   }
+
+
+#  dynamic "network_interface" {
+#    for_each = compact(concat(list(var.network_id, var.loadbalancer_network_id)))
+#    content {
+#      network_id = network_interface.value
+#    }
+#  }
 
 
   dynamic "disk" {
