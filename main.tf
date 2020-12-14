@@ -14,6 +14,15 @@ locals {
   storage_fqdns       = [for idx in range(var.storage_count) : "storage-${idx}.${local.cluster_domain}"]
 }
 
+provider "vcd" {
+  user                 = var.vcd_user
+  password             = var.vcd_password
+  org                  = var.vcd_org
+  url                  = var.vcd_url
+  max_retry_timeout    = 30
+  allow_unverified_ssl = true
+  logging              = true
+}
 
 resource "vcd_vapp_org_network" "vappOrgNet" {
   org          = var.vcd_org
