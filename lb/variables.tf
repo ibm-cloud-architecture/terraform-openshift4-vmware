@@ -75,13 +75,13 @@ variable "guest_id" {
 #  type = string
 #}
 
-variable "folder_id" {
-  type = string
-}
+#variable "folder_id" {
+#  type = string
+#}
 
-variable "datastore_id" {
-  type = string
-}
+#variable "datastore_id" {
+#  type = string
+#}
 
 variable "network_id" {
   type = string
@@ -91,9 +91,9 @@ variable "cluster_domain" {
   type = string
 }
 
-variable "datacenter_id" {
-  type = string
-}
+#variable "datacenter_id" {
+#  type = string
+#}
 
 variable "machine_cidr" {
   type = string
@@ -119,7 +119,7 @@ variable "extra_disk_size" {
   default = 0
 }
 
-variable "nested_hv_enabled" {
-  type    = bool
-  default = false
-}
+#variable "nested_hv_enabled" {
+#  type    = bool
+#  default = false
+#}
