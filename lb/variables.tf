@@ -71,9 +71,9 @@ variable "guest_id" {
   type = string
 }
 
-variable "resource_pool_id" {
-  type = string
-}
+#variable "resource_pool_id" {
+#  type = string
+#}
 
 variable "folder_id" {
   type = string
