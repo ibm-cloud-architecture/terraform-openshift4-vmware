@@ -153,8 +153,9 @@ module "lb" {
 #  resource_pool_id        = vsphere_resource_pool.resource_pool.id
 #  datastore_id            = data.vsphere_datastore.datastore.id
 #  datacenter_id           = data.vsphere_datacenter.dc.id
-  network_id              = vm_network
-  loadbalancer_network_id = var.loadbalancer_network == "" ? "" : data.vsphere_network.loadbalancer_network[0].id
+  network_id              = var.vm_network
+#  loadbalancer_network_id = var.loadbalancer_network == "" ? "" : data.vsphere_network.loadbalancer_network[0].id
+  loadbalancer_network_id = var.loadbalancer_network 
 #  folder_id               = vsphere_folder.folder.path
   guest_id                = data.vsphere_virtual_machine.template.guest_id
   template_uuid           = data.vsphere_virtual_machine.template.id

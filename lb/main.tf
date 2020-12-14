@@ -87,7 +87,7 @@ resource "vcd_vapp_vm" "vm" {
     content {
       label            = "disk${disk.key}"
       size             = disk.value
-      thin_provisioned = var.disk_thin_provisioned
+#      thin_provisioned = var.disk_thin_provisioned
       unit_number      = disk.key
     }
   }
