@@ -19,3 +19,4 @@ makefile
 **/artifacts/*
 **/terraform.tfstate.d/*
 **/installer/*
+**/go-vcloud-director.log
