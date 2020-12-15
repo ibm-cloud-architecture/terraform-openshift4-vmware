@@ -160,8 +160,12 @@ module "lb" {
 #  guest_id                = data.vsphere_virtual_machine.template.guest_id
 #  template_uuid           = data.vsphere_virtual_machine.template.id
 #  disk_thin_provisioned   = data.vsphere_virtual_machine.template.disks[0].thin_provisioned
-   vcd_catalog             = var.vcd_catalog
-   vm_template             = var.vm_template
+#   vcd_catalog             = var.vcd_catalog
+#   vm_template             = var.vm_template
+   vm_template             = "lbopenshiftv2"
+   vcd_catalog             = "Stu Catalog"
    num_cpus                = 2
+   vcd_vdc                 = var.vcd_vdc
+   vcd_org                 = var.vcd_org 
    app_name                = local.app_name
 }

@@ -1,3 +1,11 @@
+variable "vcd_vdc"     {
+  type = string
+}
+
+variable "vcd_org"     {
+  type = string
+}
+
 variable "app_name"    {
   type=string
 }

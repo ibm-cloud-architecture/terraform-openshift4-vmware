@@ -61,6 +61,8 @@ resource "vcd_vapp_vm" "loadbalancer" {
 #  folder           = var.folder_id
 #  enable_disk_uuid = "true"
 #  nested_hv_enabled = var.nested_hv_enabled
+  vdc              = var.vcd_vdc
+  org              = var.vcd_org
   name             = "loadbalancer"
   cpus             = var.num_cpus
   memory           = var.memory
@@ -69,7 +71,8 @@ resource "vcd_vapp_vm" "loadbalancer" {
   catalog_name= var.vcd_catalog
   template_name=var.vm_template
   power_on= false
-  expose_hardware_virtualization = true
+
+  expose_hardware_virtualization = false # needs to be false for LB 
 
 #  wait_for_guest_net_timeout  = "0"
 #  wait_for_guest_net_routable = "false"
@@ -78,7 +81,8 @@ resource "vcd_vapp_vm" "loadbalancer" {
   network {
     type               = "org"
     name               = var.network_id
-    ip_allocation_mode = "STATIC"
+    ip                 = "172.16.0.50"
+    ip_allocation_mode = "MANUAL"
     is_primary         = true
   }
 
@@ -91,25 +95,51 @@ resource "vcd_vapp_vm" "loadbalancer" {
 #  }
 
 
-  dynamic "disk" {
-    for_each = local.disk_sizes
-    content {
-      label            = "disk${disk.key}"
-      size             = disk.value
+#  dynamic "disk" {
+#    for_each = local.disk_sizes
+#    content {
+#      label            = "disk${disk.key}"
+#      size             = disk.value
 #      thin_provisioned = var.disk_thin_provisioned
-      unit_number      = disk.key
-    }
+#      unit_number      = disk.key
+#    }
+#  }
+  override_template_disk {
+    bus_type           = "paravirtual"
+    size_in_mb         = "250000"
+    bus_number         = 0
+    unit_number        = 0
+    iops               = 500
+    storage_profile    = "4 IOPS/GB"  
+}
+  guest_properties = {
+    "guestinfo.ignition.config.data"          = base64encode(data.ignition_config.ignition.rendered)
+    "guestinfo.ignition.config.data.encoding" = "base64"
   }
+}
+
+resource "vcd_vm_internal_disk" "disk1" {
+  vapp_name       =  var.app_name
+  vdc              = var.vcd_vdc
+  org              = var.vcd_org
+  vm_name         = "loadbalancer"
+  bus_type        = "paravirtual"
+  size_in_mb      = "133330"
+  bus_number      = 0
+  unit_number     = 1
+  iops               = 100
+  storage_profile = "4 IOPS/GB"
+  allow_vm_reboot = true
+  depends_on      = [vcd_vapp_vm.loadbalancer]
+}
+
+
 
 #  clone {
 #    template_uuid = var.template_uuid
 #  }
 
-  extra_config = {
-    "guestinfo.ignition.config.data"          = base64encode(data.ignition_config.ignition.rendered)
-    "guestinfo.ignition.config.data.encoding" = "base64"
-  }
-}
+
 
 resource "local_file" "write_ignition" {
   content         = data.ignition_config.ignition.rendered
