@@ -169,3 +169,16 @@ module "lb" {
    vcd_org                 = var.vcd_org 
    app_name                = local.app_name
 }
+module "ignition" {
+  source              = "./ignition"
+  ssh_public_key      = chomp(tls_private_key.installkey.public_key_openssh)
+  base_domain         = var.base_domain
+  cluster_id          = var.cluster_id
+  cluster_cidr        = var.openshift_cluster_cidr
+  cluster_hostprefix  = var.openshift_host_prefix
+  cluster_servicecidr = var.openshift_service_cidr
+  machine_cidr        = var.machine_cidr
+  pull_secret         = var.openshift_pull_secret
+  openshift_version   = var.openshift_version
+  total_node_count    = var.compute_count + var.storage_count
+}

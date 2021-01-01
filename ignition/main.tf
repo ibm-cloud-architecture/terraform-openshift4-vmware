@@ -3,21 +3,12 @@ data "template_file" "install_config" {
 apiVersion: v1
 baseDomain: ${var.base_domain}
 compute:
-- architecture: amd64
-  hyperthreading: Enabled
+- hyperthreading: Enabled
   name: worker
   replicas: 0
 controlPlane:
-  architecture: amd64
   hyperthreading: Enabled
   name: master
-  platform:
-    vsphere:
-      coresPerSocket: 1
-      cpus: ${var.master_cpu}
-      memoryMB: ${var.master_memory}
-      osDisk:
-        diskSizeGB: ${var.master_disk_size}
   replicas: 3
 metadata:
   name: ${var.cluster_id}
@@ -25,18 +16,11 @@ networking:
   clusterNetwork:
   - cidr: ${var.cluster_cidr}
     hostPrefix: ${var.cluster_hostprefix}
-  machineNetwork:
-  - cidr: ${var.machine_cidr}
   networkType: OpenShiftSDN
   serviceNetwork:
   - ${var.cluster_servicecidr}
 platform:
-  vsphere:
-    vCenter: ${var.vsphere_server}
-    username: ${var.vsphere_username}
-    password: ${var.vsphere_password}
-    datacenter: ${var.vsphere_datacenter}
-    defaultDatastore: ${var.vsphere_datastore}
+  none: {}  
 pullSecret: '${chomp(file(var.pull_secret))}'
 sshKey: '${var.ssh_public_key}'
 EOF
@@ -80,7 +64,7 @@ resource "null_resource" "download_binaries" {
     command = <<EOF
 set -ex
 test -e ${local.installerdir} || mkdir -p ${local.installerdir}
-if [[ $(uname -s) == "Darwin" ]]; then PLATFORM="mac"; else PLATFOMR="linux"; fi
+if [[ $(uname -s) == "Darwin" ]]; then PLATFORM="mac"; else PLATFORM="linux"; fi
 curl -o ${local.installerdir}/openshift-installer.tar.gz https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/latest-${var.openshift_version}/openshift-install-$PLATFORM.tar.gz
 tar -xf ${local.installerdir}/openshift-installer.tar.gz -C ${local.installerdir}
 EOF
