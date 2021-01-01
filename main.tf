@@ -150,9 +150,6 @@ module "lb" {
 
   hostnames_ip_addresses  = zipmap(local.lb_fqdns, [var.lb_ip_address])
   machine_cidr            = var.machine_cidr
-#  resource_pool_id        = vsphere_resource_pool.resource_pool.id
-#  datastore_id            = data.vsphere_datastore.datastore.id
-#  datacenter_id           = data.vsphere_datacenter.dc.id
   network_id              = var.vm_network
 #  loadbalancer_network_id = var.loadbalancer_network == "" ? "" : data.vsphere_network.loadbalancer_network[0].id
   loadbalancer_network_id = var.loadbalancer_network 
@@ -161,9 +158,12 @@ module "lb" {
 #  template_uuid           = data.vsphere_virtual_machine.template.id
 #  disk_thin_provisioned   = data.vsphere_virtual_machine.template.disks[0].thin_provisioned
 #   vcd_catalog             = var.vcd_catalog
-#   vm_template             = var.vm_template
-   vm_template             = "lbopenshiftv2"
-   vcd_catalog             = "Stu Catalog"
+#    vm_template             = "lbopenshiftv2"
+#   vcd_catalog             = "Stu Catalog"
+   vcd_catalog             = var.vcd_catalog
+   lb_template             = var.lb_template
+
+   
    num_cpus                = 2
    vcd_vdc                 = var.vcd_vdc
    vcd_org                 = var.vcd_org 
@@ -181,4 +181,29 @@ module "ignition" {
   pull_secret         = var.openshift_pull_secret
   openshift_version   = var.openshift_version
   total_node_count    = var.compute_count + var.storage_count
+}
+
+module "bootstrap" {
+  source = "./vm"
+
+  ignition = module.ignition.bootstrap_ignition
+
+  hostnames_ip_addresses = zipmap(
+    local.bootstrap_fqdns,
+    [var.bootstrap_ip_address]
+  )
+
+
+  cluster_domain = local.cluster_domain
+  machine_cidr   = var.machine_cidr
+#  vm_template             = var.rhcos_template
+  network_id              = var.vm_network
+  vcd_catalog             = var.vcd_catalog
+  vcd_vdc                 = var.vcd_vdc
+  vcd_org                 = var.vcd_org 
+  app_name                = local.app_name
+  rhcos_template          = var.rhcos_template
+  num_cpus      = 2
+  memory        = 8192
+  dns_addresses = var.create_loadbalancer_vm ? [var.lb_ip_address] : var.vm_dns_addresses
 }

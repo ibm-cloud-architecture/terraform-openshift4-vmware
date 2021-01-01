@@ -84,7 +84,9 @@ resource "null_resource" "generate_manifests" {
     command = <<EOF
 set -ex
 ${local.installerdir}/openshift-install --dir=${local.installerdir}/ create manifests --log-level debug
+touch ${local.installerdir}/openshift/99_openshift-cluster-api_master-machines1
 rm ${local.installerdir}/openshift/99_openshift-cluster-api_master-machines*
+touch ${local.installerdir}/openshift/99_openshift-cluster-api_worker-machineset1
 rm ${local.installerdir}/openshift/99_openshift-cluster-api_worker-machineset*
 cp ${path.module}/templates/99_01-post-deployment.yaml ${local.installerdir}/manifests
 cp ${path.module}/templates/99_02-post-deployment.yaml ${local.installerdir}/manifests

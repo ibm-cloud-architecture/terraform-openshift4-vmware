@@ -56,10 +56,20 @@ variable "vcd_catalog" {
   description = "This is the vcd catalog to use for the environment."
 }
 
-variable "vm_template" {
+variable "lb_template" {
   type        = string
-  description = "This is the name of the VM template to clone."
+  description = "This is the name of the LB template to clone."
 }
+
+variable "rhcos_template" {
+  type        = string
+  description = "This is the name of the RHCOS template to clone."
+}
+
+#variable "vm_template" {
+#  type        = string
+#  description = "This is the name of the VM template to clone."
+#}
 
 variable "vm_network" {
   type        = string

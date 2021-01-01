@@ -10,15 +10,16 @@ variable "app_name"    {
   type=string
 }
 
-variable "vm_template" {
-  type = string
-}
 
 variable "vcd_catalog"  {
   type = string
 }
 
 variable "lb_ip_address" {
+  type = string
+}
+
+variable "lb_template" {
   type = string
 }
 

@@ -7,41 +7,32 @@ variable "ignition" {
   default = ""
 }
 
-variable "disk_thin_provisioned" {
-  type = bool
+variable "rhcos_template" {
+  type    = string
+  default = ""
 }
 
-variable "template_uuid" {
+
+variable "vcd_vdc"     {
   type = string
 }
 
-variable "guest_id" {
+variable "vcd_org"     {
   type = string
 }
 
-variable "resource_pool_id" {
-  type = string
+variable "app_name"    {
+  type=string
 }
 
-variable "folder_id" {
+
+variable "vcd_catalog"  {
   type = string
 }
-
-variable "datastore_id" {
-  type = string
-}
-
-variable "network_id" {
-  type = string
-}
-
 variable "cluster_domain" {
   type = string
 }
 
-variable "datacenter_id" {
-  type = string
-}
 
 variable "machine_cidr" {
   type = string
@@ -72,4 +63,8 @@ variable "extra_disk_size" {
 variable "nested_hv_enabled" {
   type    = bool
   default = false
+}
+
+variable "network_id" {
+  type = string
 }

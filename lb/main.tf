@@ -52,24 +52,19 @@ data "template_file" "lb_ignition" {
 
 resource "vcd_vapp_vm" "loadbalancer" {
 
-#  for_each = var.hostnames_ip_addresses
-#
-#  name = element(split(".", each.key), 0)
+   for_each = var.hostnames_ip_addresses
+ 
+   name = element(split(".", each.key), 0)
 
-#  resource_pool_id = var.resource_pool_id
-#  datastore_id     = var.datastore_id
-#  folder           = var.folder_id
-#  enable_disk_uuid = "true"
-#  nested_hv_enabled = var.nested_hv_enabled
+
   vdc              = var.vcd_vdc
   org              = var.vcd_org
-  name             = "loadbalancer"
   cpus             = var.num_cpus
   memory           = var.memory
 #  guest_id         = var.guest_id
   vapp_name= var.app_name
   catalog_name= var.vcd_catalog
-  template_name=var.vm_template
+  template_name=var.lb_template
   power_on= false
 
   expose_hardware_virtualization = false # needs to be false for LB 
@@ -118,20 +113,20 @@ resource "vcd_vapp_vm" "loadbalancer" {
   }
 }
 
-resource "vcd_vm_internal_disk" "disk1" {
-  vapp_name       =  var.app_name
-  vdc              = var.vcd_vdc
-  org              = var.vcd_org
-  vm_name         = "loadbalancer"
-  bus_type        = "paravirtual"
-  size_in_mb      = "133330"
-  bus_number      = 0
-  unit_number     = 1
-  iops               = 100
-  storage_profile = "4 IOPS/GB"
-  allow_vm_reboot = true
-  depends_on      = [vcd_vapp_vm.loadbalancer]
-}
+#resource "vcd_vm_internal_disk" "disk1" {
+#  vapp_name       =  var.app_name
+#  vdc              = var.vcd_vdc
+#  org              = var.vcd_org
+#  vm_name         = var.name
+#  bus_type        = "paravirtual"
+#  size_in_mb      = "133330"
+#  bus_number      = 0
+#  unit_number     = 1
+#  iops               = 100
+#  storage_profile = "4 IOPS/GB"
+#  allow_vm_reboot = true
+#  depends_on      = [vcd_vapp_vm.loadbalancer]
+#}
 
 
 

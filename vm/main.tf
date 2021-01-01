@@ -6,43 +6,47 @@ locals {
   )
 }
 
-resource "vsphere_virtual_machine" "vm" {
+resource "vcd_vapp_vm" "vm" {
   for_each = var.hostnames_ip_addresses
 
   name = element(split(".", each.key), 0)
 
-  resource_pool_id = var.resource_pool_id
-  datastore_id     = var.datastore_id
-  num_cpus         = var.num_cpus
+#  resource_pool_id = var.resource_pool_id
+#  datastore_id     = var.datastore_id
+
+#  guest_id         = var.guest_id
+##  folder           = var.folder_id
+# nested_hv_enabled = var.nested_hv_enabled
+#  enable_disk_uuid = "true"
+  cpus             = var.num_cpus
   memory           = var.memory
-  guest_id         = var.guest_id
-  folder           = var.folder_id
-  enable_disk_uuid = "true"
+  vdc              = var.vcd_vdc
+  org              = var.vcd_org
+  vapp_name= var.app_name
+  catalog_name= var.vcd_catalog
+  template_name=var.rhcos_template
+  power_on= false
 
-  wait_for_guest_net_timeout  = "0"
-  wait_for_guest_net_routable = "false"
+   network {
+     type               = "org"
+     name               = var.network_id
+#    ip                 = "172.16.0.50"
+     ip_allocation_mode = "NONE"
+     is_primary         = true
+   }
+ 
+  override_template_disk {
+    bus_type           = "paravirtual"
+    size_in_mb         = "250000"
+    bus_number         = 0
+    unit_number        = 0
+    iops               = 500
+    storage_profile    = "4 IOPS/GB"  
+}
 
-  nested_hv_enabled = var.nested_hv_enabled
 
-  network_interface {
-    network_id = var.network_id
-  }
 
-  dynamic "disk" {
-    for_each = local.disk_sizes
-    content {
-      label            = "disk${disk.key}"
-      size             = disk.value
-      thin_provisioned = var.disk_thin_provisioned
-      unit_number      = disk.key
-    }
-  }
-
-  clone {
-    template_uuid = var.template_uuid
-  }
-
-  extra_config = {
+  guest_properties = {
     "guestinfo.ignition.config.data"           = base64encode(var.ignition)
     "guestinfo.ignition.config.data.encoding"  = "base64"
     "guestinfo.afterburn.initrd.network-kargs" = "ip=${each.value}::${cidrhost(var.machine_cidr, 1)}:${cidrnetmask(var.machine_cidr)}:${element(split(".", each.key), 0)}:ens192:none ${join(" ", formatlist("nameserver=%v", var.dns_addresses))}"
