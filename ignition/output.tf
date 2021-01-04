@@ -13,3 +13,7 @@ output "master_ignition" {
 output "worker_ignition" {
   value = data.local_file.worker_ignition.content
 }
+
+output "append_bootstrap" {
+  value = data.template_file.append_bootstrap.rendered
+}

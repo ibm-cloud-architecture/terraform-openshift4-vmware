@@ -56,8 +56,8 @@ data "template_file" "post_deployment_06" {
 }
 
 locals {
-  installerdir = "${path.root}/installer/${var.cluster_id}"
-  bootstrap_ignition_url = "http://172.16.0.10/${path.root}/installer/${var.cluster_id}/bootstrap.ign"
+  installerdir = "${path.cwd}/installer/${var.cluster_id}"
+  bootstrap_ignition_url = "http://172.16.0.10${local.installerdir}/bootstrap.ign"
 }
 
 
@@ -146,18 +146,23 @@ data "local_file" "bootstrap_ignition" {
   ]
 }
 
+
+
+data "template_file" "append_bootstrap" {
+  template = templatefile("${path.module}/templates/append_bootstrap.ign", {
+    bootstrap_ignition_url = local.bootstrap_ignition_url
+  })
+    depends_on = [
+      null_resource.generate_ignition
+  ]
+}
+
 resource "local_file" "append_bootstrap" {
   content  = data.template_file.append_bootstrap.rendered
   filename = "${local.installerdir}/append_bootstrap.ign"
   depends_on = [
     null_resource.generate_manifests,
   ]
-}
-
-data "template_file" "append_bootstrap" {
-  template = templatefile("${path.module}/templates/append_bootstrap.ign", {
-    bootstrap_ignition_url = local.bootstrap_ignition_url
-  })
 }
 data "local_file" "master_ignition" {
   filename = "${local.installerdir}/master.ign"
