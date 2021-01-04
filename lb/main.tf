@@ -32,18 +32,19 @@ data "template_file" "lb_ignition" {
       cluster_domain = var.cluster_domain
       ens_device     = "ens192"
       prefix         = element(split("/", var.machine_cidr), 1)
-      gateway        = local.dual_homed ? "" : cidrhost(var.machine_cidr, 1)
+      gateway        = "172.16.0.1"      
     }))
-    dual_homed = local.dual_homed
-    staticip_file_loadbalancer = base64encode(templatefile("${path.module}/templates/ifcfg.tmpl", {
-      dns_addresses  = var.vm_dns_addresses
-      machine_cidr   = var.loadbalancer_cidr
-      ip_address     = var.loadbalancer_ip
-      cluster_domain = var.cluster_domain
-      ens_device     = "ens224"
-      prefix         = local.dual_homed ? element(split("/", var.machine_cidr), 1) : ""
+     dual_homed = local.dual_homed
+     staticip_file_loadbalancer = base64encode(templatefile("${path.module}/templates/ifcfg.tmpl", {
+       dns_addresses  = var.vm_dns_addresses
+       machine_cidr   = var.loadbalancer_cidr
+       ip_address     = var.loadbalancer_ip
+       cluster_domain = var.cluster_domain
+       ens_device     = "ens224"
+       prefix         = local.dual_homed ? element(split("/", var.machine_cidr), 1) : ""
+       gateway        = "172.16.0.1"
       gateway        = local.dual_homed ? cidrhost(var.loadbalancer_cidr, 1) : ""
-    }))
+     }))
     hostname_file        = base64encode("lb-0")
     haproxy_systemd_unit = file("${path.module}/templates/haproxy.service")
     coredns_systemd_unit = file("${path.module}/templates/coredns.service")
@@ -76,7 +77,8 @@ resource "vcd_vapp_vm" "loadbalancer" {
   network {
     type               = "org"
     name               = var.network_id
-    ip                 = "172.16.0.50"
+#    ip                 = var.lb_ip_address
+    ip                 = "172.16.0.19"
     ip_allocation_mode = "MANUAL"
     is_primary         = true
   }
@@ -110,6 +112,7 @@ resource "vcd_vapp_vm" "loadbalancer" {
   guest_properties = {
     "guestinfo.ignition.config.data"          = base64encode(data.ignition_config.ignition.rendered)
     "guestinfo.ignition.config.data.encoding" = "base64"
+#    "guestinfo.afterburn.initrd.network-kargs" = "ip=${var.lb_ip_address}::${cidrhost(var.machine_cidr, 1)}:${cidrnetmask(var.machine_cidr)}:${element(split(".", each.key), 0)}:ens192:none ${join(" ", formatlist("nameserver=%v", var.dns_addresses))}"
   }
 }
 

@@ -5,6 +5,7 @@
 
 locals {
   app_name           = "${var.cluster_id}-${var.base_domain}"
+  vcd_net_name        = var.vm_network
   cluster_domain      = "${var.cluster_id}.${var.base_domain}"
   bootstrap_fqdns     = ["bootstrap-0.${local.cluster_domain}"]
   lb_fqdns            = ["lb-0.${local.cluster_domain}"]
@@ -43,59 +44,12 @@ resource "vcd_vapp" "app_name" {
   name = local.app_name
 
 }
-#
-
-#provider "vsphere" {
-#  user                 = var.vsphere_user
-#  password             = var.vsphere_password
-#  vsphere_server       = var.vsphere_server
-#  allow_unverified_ssl = true
-#}
-
-#data "vsphere_datacenter" "dc" {
-#  name = var.vsphere_datacenter
-#}
-
-#data "vsphere_compute_cluster" "compute_cluster" {
-#  name          = var.vsphere_cluster
-#  datacenter_id = data.vsphere_datacenter.dc.id
-#}
-
-#data "vsphere_datastore" "datastore" {
-#  name          = var.vsphere_datastore
-#  datacenter_id = data.vsphere_datacenter.dc.id
-#}
-
-#data "vsphere_network" "network" {
-#  name          = var.vm_network
-#  datacenter_id = data.vsphere_datacenter.dc.id
-#}
-
-#data "vsphere_network" "loadbalancer_network" {
-#  count         = var.loadbalancer_network == "" ? 0 : 1
-#  name          = var.loadbalancer_network
-#  datacenter_id = data.vsphere_datacenter.dc.id
-#}
-
-#data "vsphere_virtual_machine" "template" {
-#  name          = var.vm_template
-#  datacenter_id = data.vsphere_datacenter.dc.id
-#}
-
-#resource "vsphere_resource_pool" "resource_pool" {
-#  name                    = var.cluster_id
-#  parent_resource_pool_id = data.vsphere_compute_cluster.compute_cluster.resource_pool_id
-#}
-
-#resource "vsphere_folder" "folder" {
-#  path          = var.cluster_id
-#  type          = "vm"
-#  datacenter_id = data.vsphere_datacenter.dc.id
-#}
 
 resource "tls_private_key" "installkey" {
   algorithm = "RSA"
   rsa_bits  = 4096
+  
+  depends_on = [vcd_vapp_org_network.vappOrgNet]
 }
 
 resource "local_file" "write_private_key" {
@@ -127,6 +81,7 @@ module "lb" {
   bootstrap_ip      = var.bootstrap_ip_address
   control_plane_ips = var.control_plane_ip_addresses
   vm_dns_addresses  = var.vm_dns_addresses
+  dns_addresses = var.create_loadbalancer_vm ? [var.lb_ip_address] : var.vm_dns_addresses
 
   dns_ip_addresses = zipmap(
     concat(
@@ -153,17 +108,10 @@ module "lb" {
   network_id              = var.vm_network
 #  loadbalancer_network_id = var.loadbalancer_network == "" ? "" : data.vsphere_network.loadbalancer_network[0].id
   loadbalancer_network_id = var.loadbalancer_network 
-#  folder_id               = vsphere_folder.folder.path
-#  guest_id                = data.vsphere_virtual_machine.template.guest_id
-#  template_uuid           = data.vsphere_virtual_machine.template.id
-#  disk_thin_provisioned   = data.vsphere_virtual_machine.template.disks[0].thin_provisioned
-#   vcd_catalog             = var.vcd_catalog
-#    vm_template             = "lbopenshiftv2"
-#   vcd_catalog             = "Stu Catalog"
+
    vcd_catalog             = var.vcd_catalog
    lb_template             = var.lb_template
-
-   
+  
    num_cpus                = 2
    vcd_vdc                 = var.vcd_vdc
    vcd_org                 = var.vcd_org 
@@ -205,5 +153,81 @@ module "bootstrap" {
   rhcos_template          = var.rhcos_template
   num_cpus      = 2
   memory        = 8192
+  dns_addresses = var.create_loadbalancer_vm ? [var.lb_ip_address] : var.vm_dns_addresses
+}
+
+module "control_plane_vm" {
+  source = "./vm"
+
+  hostnames_ip_addresses = zipmap(
+    local.control_plane_fqdns,
+    var.control_plane_ip_addresses
+  )
+
+  ignition = module.ignition.master_ignition
+
+  network_id            = var.vm_network
+  vcd_catalog             = var.vcd_catalog
+  vcd_vdc                 = var.vcd_vdc
+  vcd_org                 = var.vcd_org 
+  app_name                = local.app_name
+  rhcos_template          = var.rhcos_template
+
+
+  cluster_domain = local.cluster_domain
+  machine_cidr   = var.machine_cidr
+
+  num_cpus      = var.control_plane_num_cpus
+  memory        = var.control_plane_memory
+  dns_addresses = var.create_loadbalancer_vm ? [var.lb_ip_address] : var.vm_dns_addresses
+}
+
+module "compute_vm" {
+  source = "./vm"
+
+  hostnames_ip_addresses = zipmap(
+    local.compute_fqdns,
+    var.compute_ip_addresses
+  )
+
+  ignition = module.ignition.worker_ignition
+
+ 
+  cluster_domain = local.cluster_domain
+  machine_cidr   = var.machine_cidr
+  network_id            = var.vm_network
+  vcd_catalog             = var.vcd_catalog
+  vcd_vdc                 = var.vcd_vdc
+  vcd_org                 = var.vcd_org 
+  app_name                = local.app_name
+  rhcos_template          = var.rhcos_template
+
+  num_cpus      = var.compute_num_cpus
+  memory        = var.compute_memory
+  dns_addresses = var.create_loadbalancer_vm ? [var.lb_ip_address] : var.vm_dns_addresses
+}
+
+module "storage_vm" {
+  source = "./vm"
+
+  hostnames_ip_addresses = zipmap(
+    local.storage_fqdns,
+    var.storage_ip_addresses
+  )
+
+  ignition = module.ignition.worker_ignition
+
+  network_id            = var.vm_network
+  vcd_catalog             = var.vcd_catalog
+  vcd_vdc                 = var.vcd_vdc
+  vcd_org                 = var.vcd_org 
+  app_name                = local.app_name
+  rhcos_template          = var.rhcos_template
+
+  cluster_domain = local.cluster_domain
+  machine_cidr   = var.machine_cidr
+
+  num_cpus      = var.storage_num_cpus
+  memory        = var.storage_memory
   dns_addresses = var.create_loadbalancer_vm ? [var.lb_ip_address] : var.vm_dns_addresses
 }

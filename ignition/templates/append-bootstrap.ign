@@ -1,0 +1,12 @@
+{
+  "ignition": {
+    "config": {
+      "merge": [
+        {
+          "source": "$(bootstrap_ignition_url)" 
+        }
+      ]
+    },
+    "version": "3.1.0"
+  }
+}

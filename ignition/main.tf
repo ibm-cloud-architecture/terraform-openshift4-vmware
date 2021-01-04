@@ -57,6 +57,13 @@ data "template_file" "post_deployment_06" {
 
 locals {
   installerdir = "${path.root}/installer/${var.cluster_id}"
+  bootstrap_ignition_url = "http://172.16.0.10/${path.root}/installer/${var.cluster_id}/bootstrap.ign"
+}
+
+data "template_file" "append-bootstrap" {
+  template = templatefile("${path.module}/templates/append-bootstrap.ign", {
+    bootstrap_ignition_url = local.bootstrap_ignition_url
+  })
 }
 
 resource "null_resource" "download_binaries" {
@@ -110,6 +117,13 @@ resource "local_file" "cluster_scheduler" {
 resource "local_file" "post_deployment_05" {
   content  = data.template_file.post_deployment_05.rendered
   filename = "${local.installerdir}/manifests/99_05-post-deployment.yaml"
+  depends_on = [
+    null_resource.generate_manifests,
+  ]
+}
+resource "local_file" "append-bootstrap" {
+  content  = data.template_file.append-bootstrap.rendered
+  filename = "${local.installerdir}/manifests/append-bootstrap.ign"
   depends_on = [
     null_resource.generate_manifests,
   ]

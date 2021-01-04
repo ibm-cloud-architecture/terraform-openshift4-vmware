@@ -80,6 +80,10 @@ variable "ignition" {
   default = ""
 }
 
+variable "dns_addresses" {
+  type = list(string)
+}
+
 #variable "disk_thin_provisioned" {
 #  type = bool
 #}

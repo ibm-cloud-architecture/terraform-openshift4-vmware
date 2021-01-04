@@ -45,9 +45,7 @@ variable "ssh_public_key" {
   type = string
 }
 
-#variable "vsphere_datacenter" {
-#  type = string
-#}
+
 
 #variable "vsphere_datastore" {
 #  type = string

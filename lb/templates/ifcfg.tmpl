@@ -5,9 +5,7 @@ DEVICE=${ens_device}
 ONBOOT=yes
 IPADDR=${ip_address}
 PREFIX=${prefix}
-%{ if gateway != "" ~}
 GATEWAY=${gateway}
-%{ endif ~}
 DOMAIN=${cluster_domain}
 %{ for index, ip in dns_addresses ~}
 DNS${index+1}=${ip}
