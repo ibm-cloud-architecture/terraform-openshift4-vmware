@@ -60,11 +60,7 @@ locals {
   bootstrap_ignition_url = "http://172.16.0.10/${path.root}/installer/${var.cluster_id}/bootstrap.ign"
 }
 
-data "template_file" "append-bootstrap" {
-  template = templatefile("${path.module}/templates/append-bootstrap.ign", {
-    bootstrap_ignition_url = local.bootstrap_ignition_url
-  })
-}
+
 
 resource "null_resource" "download_binaries" {
   provisioner "local-exec" {
@@ -121,13 +117,7 @@ resource "local_file" "post_deployment_05" {
     null_resource.generate_manifests,
   ]
 }
-resource "local_file" "append-bootstrap" {
-  content  = data.template_file.append-bootstrap.rendered
-  filename = "${local.installerdir}/manifests/append-bootstrap.ign"
-  depends_on = [
-    null_resource.generate_manifests,
-  ]
-}
+
 
 resource "local_file" "post_deployment_06" {
   content  = data.template_file.post_deployment_06.rendered
@@ -156,6 +146,19 @@ data "local_file" "bootstrap_ignition" {
   ]
 }
 
+resource "local_file" "append_bootstrap" {
+  content  = data.template_file.append_bootstrap.rendered
+  filename = "${local.installerdir}/append_bootstrap.ign"
+  depends_on = [
+    null_resource.generate_manifests,
+  ]
+}
+
+data "template_file" "append_bootstrap" {
+  template = templatefile("${path.module}/templates/append_bootstrap.ign", {
+    bootstrap_ignition_url = local.bootstrap_ignition_url
+  })
+}
 data "local_file" "master_ignition" {
   filename = "${local.installerdir}/master.ign"
   depends_on = [

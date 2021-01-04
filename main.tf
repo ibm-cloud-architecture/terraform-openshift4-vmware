@@ -134,7 +134,7 @@ module "ignition" {
 module "bootstrap" {
   source = "./vm"
 
-  ignition = module.ignition.bootstrap_ignition
+  ignition = module.ignition.append_bootstrap
 
   hostnames_ip_addresses = zipmap(
     local.bootstrap_fqdns,
