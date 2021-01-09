@@ -77,8 +77,7 @@ resource "vcd_vapp_vm" "loadbalancer" {
   network {
     type               = "org"
     name               = var.network_id
-#    ip                 = var.lb_ip_address
-    ip                 = "172.16.0.19"
+    ip                 = var.lb_ip_address
     ip_allocation_mode = "MANUAL"
     is_primary         = true
   }

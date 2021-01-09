@@ -30,6 +30,7 @@ resource "vcd_vapp_org_network" "vappOrgNet" {
   vdc          = var.vcd_vdc
 
   vapp_name         = local.app_name
+#  is_fenced = true
 
  # Comment below line to create an isolated vApp network
   org_network_name  = var.vm_network

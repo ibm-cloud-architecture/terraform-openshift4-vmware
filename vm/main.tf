@@ -15,7 +15,7 @@ resource "vcd_vapp_vm" "vm" {
   memory           = var.memory
   vdc              = var.vcd_vdc
   org              = var.vcd_org
-  hardware_version = "vmx-14"
+#  hardware_version = "vmx-14"
   vapp_name= var.app_name
   catalog_name= var.vcd_catalog
   template_name=var.rhcos_template
@@ -24,8 +24,9 @@ resource "vcd_vapp_vm" "vm" {
    network {
      type               = "org"
      name               = var.network_id
-     ip_allocation_mode = "POOL"
+     ip_allocation_mode = "DHCP"
  #   ip                 = "172.16.0.12"
+ #    ip                 = each.value
    }
  
   override_template_disk {
@@ -40,8 +41,9 @@ resource "vcd_vapp_vm" "vm" {
 
 
   guest_properties = {
+    "guestinfo.afterburn.initrd.network-kargs" = "rd.neednet=1 ip=${each.value}::${cidrhost(var.machine_cidr, 1)}:${cidrnetmask(var.machine_cidr)}:${element(split(".", each.key), 0)}:ens192:off ${join(" ", formatlist("nameserver=%v", var.dns_addresses))}"
     "guestinfo.ignition.config.data"           = base64encode(var.ignition)
     "guestinfo.ignition.config.data.encoding"  = "base64"
-    "guestinfo.afterburn.initrd.network-kargs" = "ip=${each.value}::${cidrhost(var.machine_cidr, 1)}:${cidrnetmask(var.machine_cidr)}:${element(split(".", each.key), 0)}:ens192:off ${join(" ", formatlist("nameserver=%v", var.dns_addresses))}"
-  }
+ #   "disk.EnableUUID"                          = "TRUE" 
+ }   
 }
