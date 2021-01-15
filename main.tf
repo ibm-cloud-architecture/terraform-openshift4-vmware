@@ -137,15 +137,14 @@ module "bootstrap" {
 
   ignition = module.ignition.append_bootstrap
 
-  hostnames_ip_addresses = zipmap(
+  hostnames_mac_addresses = zipmap(
     local.bootstrap_fqdns,
-    [var.bootstrap_ip_address]
+    [var.bootstrap_mac_address]
   )
 
 
   cluster_domain = local.cluster_domain
   machine_cidr   = var.machine_cidr
-#  vm_template             = var.rhcos_template
   network_id              = var.vm_network
   vcd_catalog             = var.vcd_catalog
   vcd_vdc                 = var.vcd_vdc
@@ -160,9 +159,9 @@ module "bootstrap" {
 module "control_plane_vm" {
   source = "./vm"
 
-  hostnames_ip_addresses = zipmap(
+  hostnames_mac_addresses = zipmap(
     local.control_plane_fqdns,
-    var.control_plane_ip_addresses
+    var.control_plane_mac_addresses
   )
 
   ignition = module.ignition.master_ignition
@@ -186,9 +185,9 @@ module "control_plane_vm" {
 module "compute_vm" {
   source = "./vm"
 
-  hostnames_ip_addresses = zipmap(
+  hostnames_mac_addresses = zipmap(
     local.compute_fqdns,
-    var.compute_ip_addresses
+    var.compute_mac_addresses
   )
 
   ignition = module.ignition.worker_ignition
@@ -211,9 +210,9 @@ module "compute_vm" {
 module "storage_vm" {
   source = "./vm"
 
-  hostnames_ip_addresses = zipmap(
+  hostnames_mac_addresses = zipmap(
     local.storage_fqdns,
-    var.storage_ip_addresses
+    var.storage_mac_addresses
   )
 
   ignition = module.ignition.worker_ignition

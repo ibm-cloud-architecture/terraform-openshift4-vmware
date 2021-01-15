@@ -1,4 +1,4 @@
-variable "hostnames_ip_addresses" {
+variable "hostnames_mac_addresses" {
   type = map(string)
 }
 
@@ -68,3 +68,6 @@ variable "nested_hv_enabled" {
 variable "network_id" {
   type = string
 }
+// variable "staticip_file_vm" {
+//  type = string
+// }

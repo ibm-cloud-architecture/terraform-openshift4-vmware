@@ -6,8 +6,10 @@ locals {
   )
 }
 
+
+
 resource "vcd_vapp_vm" "vm" {
-  for_each = var.hostnames_ip_addresses
+  for_each = var.hostnames_mac_addresses
 
   name = element(split(".", each.key), 0)
 
@@ -24,9 +26,8 @@ resource "vcd_vapp_vm" "vm" {
    network {
      type               = "org"
      name               = var.network_id
-     ip_allocation_mode = "MANUAL"
- #   ip                 = "172.16.0.12"
-    ip                 = each.value
+     ip_allocation_mode = "DHCP"
+    mac                 = each.value
     is_primary         = true
    }
  

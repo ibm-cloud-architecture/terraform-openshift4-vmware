@@ -115,6 +115,11 @@ variable "bootstrap_ip_address" {
   default = ""
 }
 
+variable "bootstrap_mac_address" {
+  type    = string
+  default = ""
+}
+
 variable "lb_ip_address" {
   type    = string
   default = ""
@@ -130,6 +135,11 @@ variable "control_plane_count" {
 }
 
 variable "control_plane_ip_addresses" {
+  type    = list(string)
+  default = []
+}
+
+variable "control_plane_mac_addresses" {
   type    = list(string)
   default = []
 }
@@ -158,6 +168,11 @@ variable "compute_ip_addresses" {
   default = []
 }
 
+variable "compute_mac_addresses" {
+  type    = list(string)
+  default = []
+}
+
 variable "compute_memory" {
   type    = string
   default = "8192"
@@ -178,6 +193,11 @@ variable "storage_count" {
 }
 
 variable "storage_ip_addresses" {
+  type    = list(string)
+  default = []
+}
+
+variable "storage_mac_addresses" {
   type    = list(string)
   default = []
 }
