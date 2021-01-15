@@ -7,6 +7,7 @@ data "ignition_file" "hostname" {
 
   path = "/etc/hostname"
   mode = "420"
+  overwrite = "true"
 
   content {
     content = element(split(".", each.key), 0)
@@ -18,6 +19,7 @@ data "ignition_file" "static_ip" {
 
   path = "/etc/sysconfig/network-scripts/ifcfg-ens192"
   mode = "420"
+  overwrite = "true"
 
   content {
     content = templatefile("${path.module}/ifcfg.tmpl", {

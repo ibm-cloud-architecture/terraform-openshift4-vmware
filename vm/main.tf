@@ -24,9 +24,10 @@ resource "vcd_vapp_vm" "vm" {
    network {
      type               = "org"
      name               = var.network_id
-     ip_allocation_mode = "DHCP"
+     ip_allocation_mode = "MANUAL"
  #   ip                 = "172.16.0.12"
- #    ip                 = each.value
+    ip                 = each.value
+    is_primary         = true
    }
  
   override_template_disk {
@@ -41,7 +42,6 @@ resource "vcd_vapp_vm" "vm" {
 
 
   guest_properties = {
-    "guestinfo.afterburn.initrd.network-kargs" = "rd.neednet=1 ip=${each.value}::${cidrhost(var.machine_cidr, 1)}:${cidrnetmask(var.machine_cidr)}:${element(split(".", each.key), 0)}:ens192:off ${join(" ", formatlist("nameserver=%v", var.dns_addresses))}"
     "guestinfo.ignition.config.data"           = base64encode(var.ignition)
     "guestinfo.ignition.config.data.encoding"  = "base64"
  #   "disk.EnableUUID"                          = "TRUE" 
