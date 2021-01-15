@@ -20,4 +20,4 @@ makefile
 **/terraform.tfstate.d/*
 **/installer/*
 **/go-vcloud-director.log
-*tmp*.*
+tmp.txt
