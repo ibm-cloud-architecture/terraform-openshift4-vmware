@@ -41,7 +41,6 @@ resource "vcd_vapp_vm" "vm" {
 }
 
 
-
   guest_properties = {
     "guestinfo.ignition.config.data"           = base64encode(var.ignition)
     "guestinfo.ignition.config.data.encoding"  = "base64"

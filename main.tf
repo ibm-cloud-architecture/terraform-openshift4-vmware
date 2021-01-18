@@ -166,7 +166,6 @@ module "control_plane_vm" {
   )
 
   ignition = module.ignition.master_ignition
-
   network_id            = var.vm_network
   vcd_catalog             = var.vcd_catalog
   vcd_vdc                 = var.vcd_vdc
@@ -195,7 +194,6 @@ module "compute_vm" {
 
   ignition = module.ignition.worker_ignition
 
- 
   cluster_domain = local.cluster_domain
   machine_cidr   = var.machine_cidr
   network_id            = var.vm_network
@@ -213,7 +211,7 @@ module "compute_vm" {
 }
 
 module "storage_vm" {
-  source = "./vm"
+  source = "./storage"
 
   hostnames_mac_addresses = zipmap(
     local.storage_fqdns,
@@ -221,7 +219,6 @@ module "storage_vm" {
   )
 
   ignition = module.ignition.worker_ignition
-
   network_id            = var.vm_network
   vcd_catalog             = var.vcd_catalog
   vcd_vdc                 = var.vcd_vdc
@@ -234,6 +231,7 @@ module "storage_vm" {
 
   num_cpus      = var.storage_num_cpus
   memory        = var.storage_memory
-  disk_size    = var.storage_disk
+  disk_size     = var.compute_disk 
+  extra_disk_size    = var.storage_disk
   dns_addresses = var.create_loadbalancer_vm ? [var.lb_ip_address] : var.vm_dns_addresses
 }
