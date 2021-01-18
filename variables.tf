@@ -119,6 +119,10 @@ variable "bootstrap_mac_address" {
   type    = string
   default = ""
 }
+variable "bootstrap_disk" {
+  type    = string
+  default = ""
+}
 
 variable "lb_ip_address" {
   type    = string
@@ -145,13 +149,19 @@ variable "control_plane_mac_addresses" {
 }
 variable "control_plane_memory" {
   type    = string
-  default = "16384"
+  default = "32768"
 }
 
 variable "control_plane_num_cpus" {
   type    = string
-  default = "4"
+  default = "8"
 }
+variable "control_disk" {
+  type    = string
+}
+
+
+
 
 //////////
 // compute machine variables
@@ -160,7 +170,7 @@ variable "control_plane_num_cpus" {
 
 variable "compute_count" {
   type    = string
-  default = "3"
+  default = "6"
 }
 
 variable "compute_ip_addresses" {
@@ -175,13 +185,18 @@ variable "compute_mac_addresses" {
 
 variable "compute_memory" {
   type    = string
-  default = "8192"
+  default = "32768"
 }
 
 variable "compute_num_cpus" {
   type    = string
-  default = "4"
+  default = "16"
 }
+variable "compute_disk" {
+  type    = string
+}
+
+
 
 //////////
 // storage machine variables
@@ -211,6 +226,12 @@ variable "storage_num_cpus" {
   type    = string
   default = "16"
 }
+
+variable "storage_disk" {
+  type    = string
+}
+
+
 //////////
 // loadbalancer machine variables
 // used to configure an extra nic for the loadbalancer

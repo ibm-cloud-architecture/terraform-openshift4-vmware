@@ -1,0 +1,19 @@
+[Unit]
+Description=dhcpd
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+TimeoutStartSec=0
+ExecStartPre=-/bin/podman kill dhcpd
+ExecStartPre=-/bin/podman rm dhcpd
+ExecStartPre=/bin/podman pull docker.io/networkboot/dhcpd
+ExecStart=/bin/podman run --name dhcpd \
+  --net=host \
+  --privileged \
+  -v /etc/dhcpd:/data:ro \
+  --restart=always \
+  docker.io/networkboot/dhcpd -conf /data/dhcpd.conf ens192
+
+[Install]
+WantedBy=multi-user.target

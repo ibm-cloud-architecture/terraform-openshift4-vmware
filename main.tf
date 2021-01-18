@@ -153,6 +153,7 @@ module "bootstrap" {
   rhcos_template          = var.rhcos_template
   num_cpus      = 2
   memory        = 8192
+  disk_size    = var.bootstrap_disk
   dns_addresses = var.create_loadbalancer_vm ? [var.lb_ip_address] : var.vm_dns_addresses
 }
 
@@ -179,6 +180,8 @@ module "control_plane_vm" {
 
   num_cpus      = var.control_plane_num_cpus
   memory        = var.control_plane_memory
+  disk_size    = var.control_disk
+
   dns_addresses = var.create_loadbalancer_vm ? [var.lb_ip_address] : var.vm_dns_addresses
 }
 
@@ -204,6 +207,8 @@ module "compute_vm" {
 
   num_cpus      = var.compute_num_cpus
   memory        = var.compute_memory
+  disk_size    = var.compute_disk
+
   dns_addresses = var.create_loadbalancer_vm ? [var.lb_ip_address] : var.vm_dns_addresses
 }
 
@@ -229,5 +234,6 @@ module "storage_vm" {
 
   num_cpus      = var.storage_num_cpus
   memory        = var.storage_memory
+  disk_size    = var.storage_disk
   dns_addresses = var.create_loadbalancer_vm ? [var.lb_ip_address] : var.vm_dns_addresses
 }

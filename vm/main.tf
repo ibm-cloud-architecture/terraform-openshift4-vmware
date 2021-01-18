@@ -33,7 +33,7 @@ resource "vcd_vapp_vm" "vm" {
  
   override_template_disk {
     bus_type           = "paravirtual"
-    size_in_mb         = "250000"
+    size_in_mb         = var.disk_size
     bus_number         = 0
     unit_number        = 0
     iops               = 500
