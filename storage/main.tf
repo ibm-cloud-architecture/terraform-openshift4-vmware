@@ -36,8 +36,8 @@ resource "vcd_vapp_vm" "storage" {
     size_in_mb         = "200000"
     bus_number         = 0
     unit_number        = 0
-    iops               = 500
-    storage_profile    = "4 IOPS/GB"  
+#    iops               = 500
+#    storage_profile    = "Standard"  
 }
 
 
@@ -58,7 +58,7 @@ resource "vcd_vm_internal_disk" "disk1" {
    bus_type           = "paravirtual"
    bus_number         = 0
    unit_number        = 1
-   iops               = 500
-   storage_profile    = "4 IOPS/GB" 
+ #  iops               = 500
+ #  storage_profile    = "Standard" 
    depends_on         = [vcd_vapp_vm.storage]
 }

@@ -105,8 +105,8 @@ resource "vcd_vapp_vm" "loadbalancer" {
     size_in_mb         = "250000"
     bus_number         = 0
     unit_number        = 0
-    iops               = 500
-    storage_profile    = "4 IOPS/GB"  
+ #   iops               = 500
+ #   storage_profile    = "STANDARD"  
 }
   guest_properties = {
     "guestinfo.ignition.config.data"          = base64encode(data.ignition_config.ignition.rendered)

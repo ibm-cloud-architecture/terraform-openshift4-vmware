@@ -74,7 +74,7 @@ module "lb" {
     var.control_plane_ip_addresses
   ])
 
-  ingress_backend_addresses = var.compute_ip_addresses
+  ingress_backend_addresses = concat(var.compute_ip_addresses, var.storage_ip_addresses)
   ssh_public_key            = chomp(tls_private_key.installkey.public_key_openssh)
 
   cluster_domain = local.cluster_domain

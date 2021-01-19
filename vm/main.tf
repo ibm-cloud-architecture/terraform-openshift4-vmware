@@ -36,8 +36,8 @@ resource "vcd_vapp_vm" "vm" {
     size_in_mb         = var.disk_size
     bus_number         = 0
     unit_number        = 0
-    iops               = 500
-    storage_profile    = "4 IOPS/GB"  
+#    iops               = 500
+#    storage_profile    = "Standard"  
 }
 
 
