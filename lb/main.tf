@@ -6,7 +6,7 @@ locals {
     local.disks
   )
 }
-
+// dhcp_mac_addresses = var.dhcp_mac_addresses
 data "template_file" "lb_ignition" {
   template = file("${path.module}/templates/ignition.tmpl")
   vars = {
@@ -24,6 +24,10 @@ data "template_file" "lb_ignition" {
       cluster_domain   = var.cluster_domain
       dns_ip_addresses = var.dns_ip_addresses
       lb_ip_address    = var.lb_ip_address
+    }))
+    dhcpd_file_conf = base64encode(templatefile("${path.module}/templates/dhcpd.tmpl", {
+      dhcp_mac_addresses   = var.dhcp_mac_addresses
+      dns_ip_addresses = var.dns_ip_addresses
     }))
     staticip_file_vm = base64encode(templatefile("${path.module}/templates/ifcfg.tmpl", {
       dns_addresses  = var.vm_dns_addresses
@@ -48,6 +52,7 @@ data "template_file" "lb_ignition" {
     hostname_file        = base64encode("lb-0")
     haproxy_systemd_unit = file("${path.module}/templates/haproxy.service")
     coredns_systemd_unit = file("${path.module}/templates/coredns.service")
+    dhcpd_systemd_unit =   file("${path.module}/templates/dhcpd.service") 
   }
 }
 

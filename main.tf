@@ -100,6 +100,12 @@ module "lb" {
       var.storage_ip_addresses
     ),
   )
+  dhcp_mac_addresses = concat(
+     list(var.bootstrap_mac_address),
+     var.control_plane_mac_addresses,
+     var.compute_mac_addresses,
+     var.storage_mac_addresses
+  )
 
   loadbalancer_ip   = var.loadbalancer_lb_ip_address
   loadbalancer_cidr = var.loadbalancer_lb_machine_cidr

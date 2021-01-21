@@ -61,6 +61,11 @@ variable "vm_dns_addresses" {
   default     = ["8.8.8.8", "8.8.4.4"]
 }
 
+//variable "dhcp_mac_addresses" {
+//  type        = list(string)
+//  description = "list of mac addresses for dhcp"
+//}
+
 /////////
 // OpenShift cluster variables
 /////////
