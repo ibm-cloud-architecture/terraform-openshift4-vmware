@@ -21,6 +21,16 @@ data "ignition_file" "coredns_corefile" {
   }
 }
 
+data "ignition_file" "dhcpd_conf" {
+  path = "/etc/dhcpd/dhcpd.conf"
+  mode = 420
+  content {
+    content = templatefile("${path.module}/templates/dhcpd.tmpl", {
+      cluster_domain   = var.cluster_domain
+      vm_dns_addresses = join(" ", var.vm_dns_addresses)
+    })
+  }
+}
 data "ignition_file" "coredns_clusterdb" {
   path = "/etc/coredns/cluster.db"
   mode = 420
@@ -89,6 +99,10 @@ data "ignition_systemd_unit" "coredns" {
   content = file("${path.module}/templates/coredns.service")
 }
 
+data "ignition_systemd_unit" "dhcpd" {
+  name    = "dhcpd.service"
+  content = file("${path.module}/templates/dhcpd.service")
+}
 data "ignition_user" "core" {
   name                = "core"
   ssh_authorized_keys = [chomp(var.ssh_public_key)]
@@ -103,6 +117,7 @@ data "ignition_config" "ignition" {
     data.ignition_file.haproxy_config.rendered,
     data.ignition_file.coredns_corefile.rendered,
     data.ignition_file.coredns_clusterdb.rendered,
+    data.ignition_file.dhcpd_conf.rendered,    
     data.ignition_file.hostname.rendered,
     data.ignition_file.static_ip.rendered,
     local.dual_homed ? data.ignition_file.static_ip_loadbalancer[0].rendered : ""
@@ -110,6 +125,8 @@ data "ignition_config" "ignition" {
   systemd = [
     data.ignition_systemd_unit.haproxy.rendered,
     data.ignition_systemd_unit.coredns.rendered,
+    data.ignition_systemd_unit.dhcpd.rendered
+
   ]
 }
 

@@ -10,10 +10,10 @@ ExecStartPre=-/bin/podman rm dhcpd
 ExecStartPre=/bin/podman pull docker.io/networkboot/dhcpd
 ExecStart=/bin/podman run --name dhcpd \
   --net=host \
-  --privileged \
-  -v /etc/dhcpd:/data:ro \
+  --privileged=true \
+  -v /etc/dhcpd:/data:rw \
   --restart=always \
-  docker.io/networkboot/dhcpd -conf /data/dhcpd.conf ens192
+  docker.io/networkboot/dhcpd ens192
 
 [Install]
 WantedBy=multi-user.target
