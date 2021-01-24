@@ -50,6 +50,10 @@ variable "control_plane_ips" {
 variable "dns_ip_addresses" {
   type = map(string)
 }
+variable "dhcp_mac_addresses" {
+  type = list(string)
+}
+
 
 variable "loadbalancer_ip" {
   type    = string
@@ -83,11 +87,6 @@ variable "ignition" {
 variable "dns_addresses" {
   type = list(string)
 }
-
-variable "dhcp_mac_addresses" {
-  type = list(string)
-}
-
 
 variable "network_id" {
   type = string

@@ -105,6 +105,11 @@ variable "lb_ip_address" {
   type    = string
   default = ""
 }
+variable "lb_mac_address" {
+  type    = string
+  default = ""
+}
+
 
 ///////////
 // control-plane machine variables
@@ -143,7 +148,13 @@ variable "control_disk" {
 //////////
 // compute machine variables
 //////////
-
+variable "compute_nodes" {
+  type = map(object({
+    host = string
+    ip = string
+    mac = string
+  }))
+  }
 
 variable "compute_count" {
   type    = string
