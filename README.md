@@ -24,7 +24,7 @@ OpenShift 4.6 User-Provided Infrastructure
 ## Installation Process
 
 ```bash
-git clone https://github.com/ibm-cloud-architecture/terraform-openshift4-vmware
+git clone https://github.com/slipsibm/terraform-openshift4-vmware
 cd terraform-openshift4-vmware
 ```
 
