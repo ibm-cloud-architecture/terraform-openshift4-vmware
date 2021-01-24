@@ -65,13 +65,13 @@ bootstrap_mac_address = "00:50:56:01:60:23"
   control_plane_mac_addresses =["00:50:56:01:60:24","00:50:56:01:60:25","00:50:56:01:60:26"]
 
 // The number of compute VMs to create. Default is 3.
-compute_count = 6
+compute_count = 3
 compute_disk =250000
 
 // The IP addresses and MAC addresses to assign to the compute VMs. The length of this list must
 // match the value of compute_count.
-    compute_ip_addresses = ["172.16.0.74","172.16.0.75","172.16.0.76","172.16.0.77","172.16.0.78","172.16.0.79"]
-    compute_mac_addresses = ["00:50:56:01:60:27","00:50:56:01:60:28","00:50:56:01:60:29","00:50:56:01:60:30","00:50:56:01:60:31","00:50:56:01:60:32"]
+    compute_ip_addresses = ["172.16.0.74","172.16.0.75","172.16.0.76"]
+    compute_mac_addresses = ["00:50:56:01:60:27","00:50:56:01:60:28","00:50:56:01:60:29"]
  
 
 
