@@ -27,7 +27,7 @@ data "ignition_file" "dhcpd_conf" {
   content {
     content = templatefile("${path.module}/templates/dhcpd.tmpl", {
       cluster_domain   = var.cluster_domain
-      vm_dns_addresses = join(" ", var.vm_dns_addresses)
+      dns_ip_addresses = join(" ", var.vm_dns_addresses)
     })
   }
 }

@@ -1,0 +1,11 @@
+.:53 {
+    forward . ${vm_dns_addresses}
+    log
+    errors
+}
+
+${cluster_domain}:53 {
+    file /data/cluster.db
+    log
+    errors
+}

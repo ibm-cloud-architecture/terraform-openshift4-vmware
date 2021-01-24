@@ -98,15 +98,20 @@ module "lb" {
       var.control_plane_ip_addresses,
       var.compute_ip_addresses,
       var.storage_ip_addresses
-    ),
-  )
-  dhcp_mac_addresses = concat(
+    )
+ ) 
+   dhcp_mac_addresses = concat(
      list(var.bootstrap_mac_address),
+     list(var.lb_mac_address),
      var.control_plane_mac_addresses,
      var.compute_mac_addresses,
      var.storage_mac_addresses
-  )
-
+    )
+    
+ //comment in when you are testing dhcp
+ //  dhcp_nodes = var.compute_nodes
+   
+ // network_inf = {var.dns_ip_addresses, dhcp_mac_addresses}
   loadbalancer_ip   = var.loadbalancer_lb_ip_address
   loadbalancer_cidr = var.loadbalancer_lb_machine_cidr
 

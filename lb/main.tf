@@ -26,8 +26,8 @@ data "template_file" "lb_ignition" {
       lb_ip_address    = var.lb_ip_address
     }))
     dhcpd_file_conf = base64encode(templatefile("${path.module}/templates/dhcpd.tmpl", {
-      dhcp_mac_addresses   = var.dhcp_mac_addresses
       dns_ip_addresses = var.dns_ip_addresses
+      dhcp_mac_addresses = var.dhcp_mac_addresses
     }))
     staticip_file_vm = base64encode(templatefile("${path.module}/templates/ifcfg.tmpl", {
       dns_addresses  = var.vm_dns_addresses
