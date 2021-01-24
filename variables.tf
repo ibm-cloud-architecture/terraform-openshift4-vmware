@@ -26,6 +26,7 @@ variable "vcd_url" {
 variable "vcd_catalog" {
   type        = string
   description = "This is the vcd catalog to use for the environment."
+  default     = "Public Catalog"
 }
 
 variable "lb_template" {
@@ -206,6 +207,7 @@ variable "storage_num_cpus" {
 
 variable "storage_disk" {
   type    = string
+  default = "2097152"
 }
 
 
