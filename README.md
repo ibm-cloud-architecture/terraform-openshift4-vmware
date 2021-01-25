@@ -316,7 +316,7 @@ firewall-cmd --reload
 #### Start HTTP Server
 The HTTP Server is used by the bootstrap and other coreOS nodes to retrieve their ignition files.
 * Important: start the server from / directory so that path to ignition files is correct!
-* `cd /; nohup python -m SimpleHTTPServer 80 &`
+* `cd /; nohup python3 -m http.server 80 &`
 * Note: to see requests to the server `tail -f /nohup.out`
 
 
