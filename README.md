@@ -7,6 +7,7 @@ The benefits of this code vs. the VCD Toolkit are:
   - This code checks for outstanding CSR's and automatically approves them so no more manual step.
   - Install doesn't require multiple steps of running scripts, then terraform then more scripts. Just set variables, run terraform, then start VM's.
 
+**You will need to do this configuration after you have mapped out your IP addresses and mac addresses. There are suggested MAC addresses in the terraform.tvars.examples file but it doesn't matter as long as you pick an address that is valid.**
 
 ![gateway](./media/edgegateway.png)
 
