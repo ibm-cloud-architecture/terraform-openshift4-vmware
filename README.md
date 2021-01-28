@@ -28,6 +28,13 @@ OpenShift 4.6 User-Provided Infrastructure
       - api.`cluster_id`.`base_domain`
       - *.apps.`cluster_id`.`base_domain`
     - Point both of those DNS A or CNAME records to either your LoadBalancers or the public IP address of the CoreOS LoadBalancer VM
+
+For example if you are using dnsmasq as your DNS server:
+    In dnsmasq.conf add:  
+    `  address=/.apps.ocp2-2w.cdastu.com/172.16.0.19`  
+    and in /etc/hosts:  
+   `172.16.0.19 api-int.test-2w.cdastu.com`    
+   `172.16.0.19 api.test-2w.cdastu.com`
 2. [CoreOS OVA](http://mirror.openshift.com/pub/openshift-v4/dependencies/rhcos/) must be uploaded to a VCD Catalog as a template.
 
 ## Installation Process
