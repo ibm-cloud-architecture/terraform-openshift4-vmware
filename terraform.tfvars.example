@@ -1,26 +1,27 @@
 
 
 
+
 // ID identifying the cluster to create. Use your username so that resources created can be tracked back to you.
 
-cluster_id = "my-cluster"
+cluster_id = "your-cluster-name"
 
 // Base domain from which the cluster domain is a subdomain.
-base_domain = "xyz.com"
+base_domain = "your-basedomain.com"
 
 // Name of the VDC.
-vcd_vdc = "vdc-name"
+vcd_vdc = "your-vdc"
 
 // User on the vSphere server.
 vcd_user = "admin"
 
 // Password of the user on the vSphere server.
-vcd_password = "vcd password"
+vcd_password = "your vdc password"
 
 // Name of the VCD organization. Found on the VCD console, Data Centers tab
-vcd_org = "long vcd org"
+vcd_org = "long vorg is from vcloud director console"
 
-// url for the vcd.
+// url for the vcd. (this is dallas)
 vcd_url = "https://daldir01.vmware-solutions.cloud.ibm.com/api"
 
 
@@ -32,7 +33,7 @@ lb_template = "rhcos OpenShift 4.6.8"
 
 
 // Name of the vcd Catalog
-vcd_catalog = "Stu Catalog"
+vcd_catalog = "Public"
 
 // Name of the VM Network for your cluster nodes
 vm_network = "ocpnet"
@@ -40,6 +41,12 @@ vm_network = "ocpnet"
 // Name of the VM Network for loadbalancer NIC in loadbalancer.
 loadbalancer_network = "ocpnet"
 
+
+//Prefix for creating MAC addresses for control, compute and storage nodes (first five parts) 
+// MAC address is created by taking this prefix appending it with the final part of the ip address
+// the MAC addresses are generated for the DHCP Reservations based on the IP address. 
+// do not use IP addresses higher than 99 in the last position
+mac_prefix="00:50:56:01:20"
 
 // The machine_cidr where IP addresses will be assigned for cluster nodes.
 // Additionally, IPAM will assign IPs based on the network ID.
@@ -56,41 +63,45 @@ control_disk = 250000
 
 // The IP address to assign to the bootstrap VM.
 bootstrap_disk = 250000
-bootstrap_ip_address = "172.16.0.70"
-bootstrap_mac_address = "00:50:56:01:60:23"
+bootstrap_ip_address = "172.16.0.20"
 
 // The IP addresses to assign to the control plane VMs. The length of this list
 // must match the value of control_plane_count.
-  control_plane_ip_addresses = ["172.16.0.71", "172.16.0.72", "172.16.0.73"]
-  control_plane_mac_addresses =["00:50:56:01:60:24","00:50:56:01:60:25","00:50:56:01:60:26"]
+  control_plane_ip_addresses = ["172.16.0.21", "172.16.0.22", "172.16.0.23"]
+ 
+
 
 // The number of compute VMs to create. Default is 3.
 compute_count = 3
 compute_disk =250000
 
-// The IP addresses and MAC addresses to assign to the compute VMs. The length of this list must
+// The IP addresses to assign to the compute VMs. The length of this list must
 // match the value of compute_count.
-    compute_ip_addresses = ["172.16.0.74","172.16.0.75","172.16.0.76"]
-    compute_mac_addresses = ["00:50:56:01:60:27","00:50:56:01:60:28","00:50:56:01:60:29"]
- 
+    compute_ip_addresses = ["172.16.0.24","172.16.0.25","172.16.0.26"]
+//    compute_ip_addresses = ["172.16.0.24"]
 
 
-// The IP address and MAC address to assign to the loadbalancer VM.
-lb_ip_address = "172.16.0.69"
-lb_mac_address = "00:50:56:01:60:22"
+// Storage Nodes disk size must be at least 2097152 (2TB) if you want to install OCS
 
-// The IP address to assign to the public loadbalancer interface
-loadbalancer_lb_ip_address = "172.16.0.69"
+storage_count = 3
+storage_disk = 2097152
+//storage_ip_addresses = ["172.16.0.35"]
+storage_ip_addresses = ["172.16.0.35", "172.16.0.36", "172.16.0.37"]
+   
+
+
+// The IP address to assign to the loadbalancer VM.
+lb_ip_address = "172.16.0.19"
+
+
+// The IP address to assign to the public loadbalancer interface 
+loadbalancer_lb_ip_address = "172.16.0.19"
 loadbalancer_lb_machine_cidr = "172.16.0.1/24"
 
-// external Load Balancers
-vm_dns_addresses = ["9.9.9.9", "1.1.1.1"]
+
+// including Bastion server for local DNS
+vm_dns_addresses = ["172.16.0.10","9.9.9.9"]
 
 openshift_pull_secret = "~/.pull-secret"
 create_loadbalancer_vm = true
-// IP Address and MAC Addresses of Storage nodes. Pick either 3 nodes or 0 nodes
-storage_count = 3
-storage_disk = 2097152
-storage_ip_addresses = ["172.16.0.83", "172.16.0.84", "172.16.0.85"]
-storage_mac_addresses = ["00:50:56:01:60:36","00:50:56:01:60:37","00:50:56:01:60:38"]
 
