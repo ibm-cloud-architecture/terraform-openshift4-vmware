@@ -1,6 +1,8 @@
 # OpenShift 4.6 UPI Deployment with Static IPs
 
-**Unfornately, the new capability of OpenShift 4.6 to pass Static IP's thru the ignition string don't currently work in the VCD environment because the ignition strings depend on VMWare vm_advanced_config parameters, which aren't available in VCD. A bugzilla has been opened ([Bugzilla ID 1913791](https://bugzilla.redhat.com/show_bug.cgi?id=1913791)) but its really a VCD issue. To get around this issue, the best approach is to come up with a scheme for DHCP reservations for the OpenShift servers based on MAC address. There is now a DHCP Server that runs on the LoadBalancer VM. **This means you can't use DHCP in the Edge Gateway so you must make sure this is disabled.**
+**Unfortunately, the new capability of OpenShift 4.6 to pass Static IP's thru the ignition string `(guestinfo.afterburn.initrd.network-kargs="ip=<ip>::<gateway>:<netmask>:<hostname>:<iface>:none nameserver=srv1 [nameserver=srv2 [nameserver=srv3 [...]]]")` don't currently work in the VCD environment because the ignition strings depend on VMWare vm_advanced_config parameters, which aren't available in VCD. A bugzilla has been opened ([Bugzilla ID 1913791](https://bugzilla.redhat.com/show_bug.cgi?id=1913791)) but its really a VCD issue. To get around this issue, the best approach is to come up with a scheme for DHCP reservations for the OpenShift servers based on MAC address. There is now a DHCP Server that runs on the LoadBalancer VM. This means you can't use DHCP in the Edge Gateway for the subnet you are using. If you start DHCP services in the Edge Gateway, make sure you don't include this subnet.**
+
+**The Loadbalancer VM will be automatically started at install time to ensure that DHCP and DNS are ready when the other machines are started.**  
 
 The benefits of this code vs. the VCD Toolkit are:
   - vcd toolkit doesn't update LB haproxy.cfg file properly if you change the number of nodes. You have to manually update.
