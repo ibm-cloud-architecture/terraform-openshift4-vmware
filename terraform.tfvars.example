@@ -83,10 +83,9 @@ compute_disk =250000
 
 // Storage Nodes disk size must be at least 2097152 (2TB) if you want to install OCS
 
-storage_count = 3
+storage_count = 0
 storage_disk = 2097152
-//storage_ip_addresses = ["172.16.0.35"]
-storage_ip_addresses = ["172.16.0.35", "172.16.0.36", "172.16.0.37"]
+// storage_ip_addresses = ["172.16.0.35", "172.16.0.36", "172.16.0.37"]
 
 
 
