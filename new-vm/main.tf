@@ -9,7 +9,7 @@ locals {
 
 
 resource "vcd_vapp_vm" "vm" {
-  for_each = var.hostnames_mac_addresses
+  for_each = var.hostnames_ip_addresses
 
   name = element(split(".", each.key), 0)
 
@@ -27,7 +27,7 @@ resource "vcd_vapp_vm" "vm" {
      type               = "org"
      name               = var.network_id
      ip_allocation_mode = "DHCP"
-    mac                 = each.value
+     mac                 = "${var.mac_prefix}:${element(split(".",each.value),3)}"
     is_primary         = true
    }
  

@@ -1,8 +1,13 @@
-variable "hostnames_mac_addresses" {
+variable "hostnames_ip_addresses" {
   type = map(string)
 }
 
 variable "ignition" {
+  type    = string
+  default = ""
+}
+
+variable "mac_prefix" {
   type    = string
   default = ""
 }

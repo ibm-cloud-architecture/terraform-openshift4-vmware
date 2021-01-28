@@ -145,6 +145,6 @@ resource "vcd_vapp_vm" "loadbalancer" {
 
 resource "local_file" "write_ignition" {
   content         = data.ignition_config.ignition.rendered
-  filename        = "${path.root}/artifacts/lb_config.json"
+  filename        = "${path.cwd}/installer/${var.cluster_id}/lb_config.json"
   file_permission = 0600
 }

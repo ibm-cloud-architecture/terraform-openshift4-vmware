@@ -3,7 +3,7 @@ locals {
 }
 
 data "ignition_file" "hostname" {
-  for_each = var.hostnames_mac_addresses
+  for_each = var.hostnames_ip_addresses
 
   path = "/etc/hostname"
   mode = "420"
@@ -15,7 +15,7 @@ data "ignition_file" "hostname" {
 }
 
 data "ignition_file" "static_ip" {
-  for_each = var.hostnames_mac_addresses
+  for_each = var.hostnames_ip_addresses
 
   path = "/etc/sysconfig/network-scripts/ifcfg-ens192"
   mode = "420"
@@ -25,7 +25,7 @@ data "ignition_file" "static_ip" {
     content = templatefile("${path.module}/ifcfg.tmpl", {
       dns_addresses = var.dns_addresses,
       machine_cidr  = var.machine_cidr
-      //ip_address     = var.hostnames_ip_addresses[count.index].value
+    //ip_address     = var.hostnames_ip_addresses[count.index].value
       ip_address     = each.value
       cluster_domain = var.cluster_domain
     })
@@ -33,7 +33,7 @@ data "ignition_file" "static_ip" {
 }
 
 data "ignition_config" "ign" {
-  for_each = var.hostnames_mac_addresses
+  for_each = var.hostnames_ip_addresses
 
   merge {
     source = local.ignition_encoded

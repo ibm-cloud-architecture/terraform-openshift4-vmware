@@ -13,3 +13,17 @@ dns     IN  A   ${lb_ip_address}
 %{ for hostname, addr in dns_ip_addresses ~}
 ${split(".", hostname)[0]}     IN A ${addr}
 %{ endfor ~}
+
+
+$ORIGIN ${element(split(".", element(split("/",machine_cidr),0)),2)}.${element(split(".", element(split("/",machine_cidr),0)),1)}.${element(split(".", element(split("/",machine_cidr),0)),0)}.in-addr.arpa.
+@       3600 IN SOA dns. openshift.${cluster_domain}. (
+                                2017042745 ; serial
+                                7200       ; refresh (2 hours)
+                                3600       ; retry (1 hour)
+                                1209600    ; expire (2 weeks)
+                                3600       ; minimum (1 hour)
+                                )
+        IN       NS     ${lb_ip_address}
+%{ for hostname, addr in dns_ip_addresses ~}
+${element(split(".",addr),3)}        IN      PTR ${hostname}.
+%{ endfor ~}

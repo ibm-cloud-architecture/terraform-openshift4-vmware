@@ -7,12 +7,12 @@ locals {
   app_name           = "${var.cluster_id}-${var.base_domain}"
   vcd_net_name        = var.vm_network
   cluster_domain      = "${var.cluster_id}.${var.base_domain}"
-  bootstrap_fqdns     = ["bootstrap-0.${local.cluster_domain}"]
-  lb_fqdns            = ["lb-0.${local.cluster_domain}"]
+  bootstrap_fqdns     = ["bootstrap-00.${local.cluster_domain}"]
+  lb_fqdns            = ["lb-00.${local.cluster_domain}"]
   api_lb_fqdns        = formatlist("%s.%s", ["api", "api-int", "*.apps"], local.cluster_domain)
-  control_plane_fqdns = [for idx in range(var.control_plane_count) : "control-plane-${idx}.${local.cluster_domain}"]
-  compute_fqdns       = [for idx in range(var.compute_count) : "compute-${idx}.${local.cluster_domain}"]
-  storage_fqdns       = [for idx in range(var.storage_count) : "storage-${idx}.${local.cluster_domain}"]
+  control_plane_fqdns = [for idx in range(var.control_plane_count) : "control-plane-0${idx}.${local.cluster_domain}"]
+  compute_fqdns       = [for idx in range(var.compute_count) : "compute-0${idx}.${local.cluster_domain}"]
+  storage_fqdns       = [for idx in range(var.storage_count) : "storage-0${idx}.${local.cluster_domain}"]
 }
 
 provider "vcd" {
@@ -55,18 +55,18 @@ resource "tls_private_key" "installkey" {
 
 resource "local_file" "write_private_key" {
   content         = tls_private_key.installkey.private_key_pem
-  filename        = "${path.root}/artifacts/openshift_rsa"
+  filename        = "${path.cwd}/installer/${var.cluster_id}/openshift_rsa"
   file_permission = 0600
 }
 
 resource "local_file" "write_public_key" {
   content         = tls_private_key.installkey.public_key_openssh
-  filename        = "${path.root}/artifacts/openshift_rsa.pub"
+  filename        = "${path.cwd}/installer/${var.cluster_id}/openshift_rsa.pub"
   file_permission = 0600
 }
 module "lb" {
   count = var.create_loadbalancer_vm ? 1 : 0
-  source        = "./lb"
+  source        = "./new-lb"
   lb_ip_address = var.lb_ip_address
 
   api_backend_addresses = flatten([
@@ -81,8 +81,8 @@ module "lb" {
 
   bootstrap_ip      = var.bootstrap_ip_address
   control_plane_ips = var.control_plane_ip_addresses
-  vm_dns_addresses  = var.vm_dns_addresses
-  dns_addresses = var.create_loadbalancer_vm ? [var.lb_ip_address] : var.vm_dns_addresses
+//  vm_dns_addresses  = var.vm_dns_addresses
+  dns_addresses = var.create_loadbalancer_vm ? concat([var.lb_ip_address],var.vm_dns_addresses) : var.vm_dns_addresses
 
   dns_ip_addresses = zipmap(
     concat(
@@ -100,16 +100,24 @@ module "lb" {
       var.storage_ip_addresses
     )
  ) 
-   dhcp_mac_addresses = concat(
-     list(var.bootstrap_mac_address),
-     list(var.lb_mac_address),
-     var.control_plane_mac_addresses,
-     var.compute_mac_addresses,
-     var.storage_mac_addresses
+
+  dhcp_ip_addresses = zipmap(
+    concat(
+      local.bootstrap_fqdns,
+      local.control_plane_fqdns,
+      local.compute_fqdns,
+      local.storage_fqdns
+    ),
+    concat(
+      list(var.bootstrap_ip_address),
+      var.control_plane_ip_addresses,
+      var.compute_ip_addresses,
+      var.storage_ip_addresses
     )
-    
- //comment in when you are testing dhcp
- //  dhcp_nodes = var.compute_nodes
+ ) 
+
+  mac_prefix = var.mac_prefix
+  cluster_id  = var.cluster_id
    
  // network_inf = {var.dns_ip_addresses, dhcp_mac_addresses}
   loadbalancer_ip   = var.loadbalancer_lb_ip_address
@@ -144,13 +152,13 @@ module "ignition" {
 }
 
 module "bootstrap" {
-  source = "./vm"
-
+  source = "./new-vm"
+  mac_prefix = var.mac_prefix
   ignition = module.ignition.append_bootstrap
 
-  hostnames_mac_addresses = zipmap(
+  hostnames_ip_addresses = zipmap(
     local.bootstrap_fqdns,
-    [var.bootstrap_mac_address]
+    [var.bootstrap_ip_address]
   )
 
 
@@ -169,12 +177,13 @@ module "bootstrap" {
 }
 
 module "control_plane_vm" {
-  source = "./vm"
-
-  hostnames_mac_addresses = zipmap(
+  source = "./new-vm"
+  mac_prefix = var.mac_prefix
+  hostnames_ip_addresses = zipmap(
     local.control_plane_fqdns,
-    var.control_plane_mac_addresses
+    var.control_plane_ip_addresses
   )
+  
 
   ignition = module.ignition.master_ignition
   network_id            = var.vm_network
@@ -196,11 +205,11 @@ module "control_plane_vm" {
 }
 
 module "compute_vm" {
-  source = "./vm"
-
-  hostnames_mac_addresses = zipmap(
+  source = "./new-vm"
+  mac_prefix = var.mac_prefix
+  hostnames_ip_addresses = zipmap(
     local.compute_fqdns,
-    var.compute_mac_addresses
+    var.compute_ip_addresses
   )
 
   ignition = module.ignition.worker_ignition
@@ -223,10 +232,10 @@ module "compute_vm" {
 
 module "storage_vm" {
   source = "./storage"
-
-  hostnames_mac_addresses = zipmap(
+  mac_prefix = var.mac_prefix 
+  hostnames_ip_addresses = zipmap(
     local.storage_fqdns,
-    var.storage_mac_addresses
+    var.storage_ip_addresses
   )
 
   ignition = module.ignition.worker_ignition

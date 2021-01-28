@@ -38,11 +38,10 @@ variable "rhcos_template" {
   description = "This is the name of the RHCOS template to clone."
 }
 
-#variable "vm_template" {
-#  type        = string
-#  description = "This is the name of the VM template to clone."
-#}
-
+variable "mac_prefix" {
+  type        = string
+  description = "Prefix for creating MAC addresses for control, compute and storage nodes (first five parts. MAC address is created by taking this prefix appending it with the final part of the ip address"
+}
 variable "vm_network" {
   type        = string
   description = "This is the name of the publicly accessible network for cluster ingress and access."
@@ -61,10 +60,7 @@ variable "vm_dns_addresses" {
   default     = ["8.8.8.8", "8.8.4.4"]
 }
 
-//variable "dhcp_mac_addresses" {
-//  type        = list(string)
-//  description = "list of mac addresses for dhcp"
-//}
+
 
 /////////
 // OpenShift cluster variables
@@ -115,6 +111,7 @@ variable "lb_mac_address" {
 // control-plane machine variables
 ///////////
 
+
 variable "control_plane_count" {
   type    = string
   default = "3"
@@ -148,13 +145,7 @@ variable "control_disk" {
 //////////
 // compute machine variables
 //////////
-variable "compute_nodes" {
-  type = map(object({
-    host = string
-    ip = string
-    mac = string
-  }))
-  }
+
 
 variable "compute_count" {
   type    = string

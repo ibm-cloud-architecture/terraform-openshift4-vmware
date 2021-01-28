@@ -19,6 +19,10 @@ variable "lb_ip_address" {
   type = string
 }
 
+variable "cluster_id" {
+  type = string
+}
+
 variable "lb_template" {
   type = string
 }
@@ -35,7 +39,7 @@ variable "ssh_public_key" {
   type = string
 }
 
-variable "vm_dns_addresses" {
+variable "dns_addresses" {
   type = list(string)
 }
 
@@ -50,10 +54,13 @@ variable "control_plane_ips" {
 variable "dns_ip_addresses" {
   type = map(string)
 }
-variable "dhcp_mac_addresses" {
-  type = list(string)
+variable "dhcp_ip_addresses" {
+  type = map(string)
 }
 
+variable "mac_prefix" {
+  type = string
+}
 
 variable "loadbalancer_ip" {
   type    = string
@@ -84,9 +91,6 @@ variable "ignition" {
   default = ""
 }
 
-variable "dns_addresses" {
-  type = list(string)
-}
 
 variable "network_id" {
   type = string
@@ -121,10 +125,3 @@ variable "extra_disk_size" {
   default = 0
 }
 
-variable "dhcp_nodes" {
-  type = map(object({
-    host = string
-    ip = string
-    mac = string
-  }))
-  }

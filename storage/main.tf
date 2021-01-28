@@ -9,9 +9,10 @@ locals {
 
 
 resource "vcd_vapp_vm" "storage" {
-  for_each = var.hostnames_mac_addresses
+  for_each = var.hostnames_ip_addresses
 
   name = element(split(".", each.key), 0)
+  
 
   cpus             = var.num_cpus
   memory           = var.memory
@@ -27,7 +28,7 @@ resource "vcd_vapp_vm" "storage" {
      type               = "org"
      name               = var.network_id
      ip_allocation_mode = "DHCP"
-    mac                 = each.value
+     mac                = "${var.mac_prefix}:${element(split(".",each.value),3)}"
     is_primary         = true
    }
  
@@ -49,7 +50,7 @@ resource "vcd_vapp_vm" "storage" {
  }   
 }
 resource "vcd_vm_internal_disk" "disk1" {
-   for_each = var.hostnames_mac_addresses
+   for_each = var.hostnames_ip_addresses
    vm_name  = element(split(".", each.key), 0)
    vapp_name = var.app_name
    vdc              = var.vcd_vdc

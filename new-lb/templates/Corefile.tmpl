@@ -1,10 +1,16 @@
 .:53 {
-    forward . ${vm_dns_addresses}
+    forward . ${dns_addresses}
     log
     errors
 }
 
 ${cluster_domain}:53 {
+    file /data/cluster.db
+    log
+    errors
+}
+
+${element(split(".", element(split("/",machine_cidr),0)),2)}.${element(split(".", element(split("/",machine_cidr),0)),1)}.${element(split(".", element(split("/",machine_cidr),0)),0)}.in-addr.arpa:53 {
     file /data/cluster.db
     log
     errors
