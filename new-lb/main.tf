@@ -72,16 +72,13 @@ resource "vcd_vapp_vm" "loadbalancer" {
   org              = var.vcd_org
   cpus             = var.num_cpus
   memory           = var.memory
-#  guest_id         = var.guest_id
   vapp_name= var.app_name
   catalog_name= var.vcd_catalog
   template_name=var.lb_template
-  power_on= false
+  power_on= true
 
   expose_hardware_virtualization = false # needs to be false for LB 
 
-#  wait_for_guest_net_timeout  = "0"
-#  wait_for_guest_net_routable = "false"
 
 
   network {
