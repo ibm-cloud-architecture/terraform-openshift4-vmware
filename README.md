@@ -298,6 +298,7 @@ The HTTP Server is used by the bootstrap and other coreOS nodes to retrieve thei
 ```bash
 git clone https://github.com/slipsibm/terraform-openshift4-vmware
 cd terraform-openshift4-vmware
+cp terraform.tfvars.example terraform.tfvars
 ```
 
 Update your `terraform.tfvars` with your environment values.  See `terraform.tfvars.example`
