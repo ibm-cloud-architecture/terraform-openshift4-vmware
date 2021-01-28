@@ -21,7 +21,7 @@ Deploy OpenShift 4.6 and later using static IP addresses for CoreOS nodes. The `
 
 OpenShift 4.6 User-Provided Infrastructure
 
-![topology](./media/topology.png)
+![topology](./media/vcd_arch.png)
 
 ## Prereqs
 
