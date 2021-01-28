@@ -1,4 +1,4 @@
-<mxfile host="app.diagrams.net" modified="2021-01-28T17:25:20.957Z" agent="5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.104 Safari/537.36" etag="sgi0Ix78fO_mikZFW425" version="14.2.7" type="github">
+<mxfile host="app.diagrams.net" modified="2021-01-28T17:35:48.129Z" agent="5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.104 Safari/537.36" etag="yD4-J3-j9GHGEx3vbvwF" version="14.2.7" type="github">
   <diagram id="jVstXWpeOwFrhO0gjqgm" name="Page-1">
     <mxGraphModel dx="1172" dy="534" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
@@ -10,7 +10,7 @@
         <mxCell id="t4Uvs53oJF9wjIU3pJhk-3" value="" style="rounded=1;whiteSpace=wrap;html=1;dashed=1;" vertex="1" parent="1">
           <mxGeometry x="40" y="200" width="760" height="490" as="geometry" />
         </mxCell>
-        <mxCell id="t4Uvs53oJF9wjIU3pJhk-4" value="&lt;div style=&quot;text-align: justify&quot;&gt;&lt;b&gt;Control Plane&lt;/b&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;dashed=1;align=left;" vertex="1" parent="1">
+        <mxCell id="t4Uvs53oJF9wjIU3pJhk-4" value="&lt;div style=&quot;text-align: justify&quot;&gt;&lt;br&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;dashed=1;align=right;labelPosition=left;verticalLabelPosition=top;verticalAlign=bottom;" vertex="1" parent="1">
           <mxGeometry x="100" y="270" width="500" height="90" as="geometry" />
         </mxCell>
         <mxCell id="t4Uvs53oJF9wjIU3pJhk-5" value="" style="rounded=0;whiteSpace=wrap;html=1;dashed=1;" vertex="1" parent="1">
@@ -18,6 +18,21 @@
         </mxCell>
         <mxCell id="t4Uvs53oJF9wjIU3pJhk-6" value="" style="rounded=0;whiteSpace=wrap;html=1;dashed=1;" vertex="1" parent="1">
           <mxGeometry x="100" y="530" width="500" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="t4Uvs53oJF9wjIU3pJhk-8" value="Control Plane" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;dashed=1;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="110" y="270" width="100" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="t4Uvs53oJF9wjIU3pJhk-9" value="Compute Plane" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;dashed=1;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="110" y="400" width="100" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="t4Uvs53oJF9wjIU3pJhk-10" value="Storage (Optional)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;dashed=1;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="110" y="530" width="110" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="t4Uvs53oJF9wjIU3pJhk-11" value="Internal Cluster" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;dashed=1;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="90" y="210" width="100" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="t4Uvs53oJF9wjIU3pJhk-12" value="" style="aspect=fixed;perimeter=ellipsePerimeter;html=1;align=center;shadow=0;dashed=0;fontColor=#4277BB;labelBackgroundColor=#ffffff;fontSize=12;spacingTop=3;image;image=img/lib/ibm/infrastructure/load_balancing_routing.svg;" vertex="1" parent="1">
+          <mxGeometry x="600" y="70" width="60" height="60" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
