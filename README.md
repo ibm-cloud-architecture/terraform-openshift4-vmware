@@ -1,15 +1,12 @@
 # OpenShift 4.6 UPI Deployment with Static IPs
 
-**Unfornately, the new capability of OpenShift 4.6 to pass Static IP's thru the ignition string don't currently work in the VCD environment because the ignition strings depend on VMWare vm_advanced_config parameters, which aren't available in VCD. A bugzilla has been opened ([Bugzilla ID 1913791](https://bugzilla.redhat.com/show_bug.cgi?id=1913791)) but its really a VCD issue. To get around this issue, the best approach is to come up with a scheme for DHCP reservations for the OpenShift servers based on MAC address. Today, this is done manually by going into the Edge Gateway Services definition and going into the DHCP Bindings section.  VCD doesn't allow terraform creation of the Edge Gateway DHCP Bindings so I am trying to figure out the best way to generate dhcpd.conf file to contain the DHCP Reservation and install a dhcpd server on the LB (alongside the DNS and HAProxy). I've already figured out how to get the dhcp server out there, I just need to generate the dhcpd.conf file. Its a little problematic in terraform so I may just use a shell script (if someone has the time to write one)**
+**Unfornately, the new capability of OpenShift 4.6 to pass Static IP's thru the ignition string don't currently work in the VCD environment because the ignition strings depend on VMWare vm_advanced_config parameters, which aren't available in VCD. A bugzilla has been opened ([Bugzilla ID 1913791](https://bugzilla.redhat.com/show_bug.cgi?id=1913791)) but its really a VCD issue. To get around this issue, the best approach is to come up with a scheme for DHCP reservations for the OpenShift servers based on MAC address. There is now a DHCP Server that runs on the LoadBalancer VM. **This means you can't use DHCP in the Edge Gateway so you must make sure this is disabled.**
 
 The benefits of this code vs. the VCD Toolkit are:
   - vcd toolkit doesn't update LB haproxy.cfg file properly if you change the number of nodes. You have to manually update.
   - This code checks for outstanding CSR's and automatically approves them so no more manual step.
   - Install doesn't require multiple steps of running scripts, then terraform then more scripts. Just set variables, run terraform, then start VM's.
 
-**You will need to do this configuration after you have mapped out your IP addresses and mac addresses. There are suggested MAC addresses in the terraform.tvars.examples file but it doesn't matter as long as you pick an address that is valid.**
-
-![gateway](./media/edgegateway.png)
 
 
 Deploy OpenShift 4.6 and later using static IP addresses for CoreOS nodes. The `ignition` module will inject code into the cluster that will automatically approve all node CSRs.  This runs only once at cluster creation.  You can delete the `ibm-post-deployment` namespace once your cluster is up and running.
@@ -173,34 +170,9 @@ Configure DNAT so that you have https access to the console from public internet
       - Translated Source IP/Range: **172.16.0.19** (This is the IP address we will use for the Load Balancer)
       - Description: **access to ocp console**
 
-#### Setup DHCP
-* Our Edge gateway will provide DHCP services.  On the Edge > DHCP, click + and configure DHCP with the following settings:
-    ```
-    IPRange: 172.16.0.150-172.16.0.245
-    Primary Nameserver: 172.16.0.10 (bastion)
-    AutoConfig DNS: no
-    Gateway: 172.16.0.1
-    Netmask: 255.255.255.0
-    Lease: 86400
-    ```
-* Toggle DHCP Service on
+#### Do not Setup DHCP within the Edge Gateway
+**You cannot use DHCP within the ESG or it will interfere with the DHCP Server deployed on the LoadBalancer. This is a change if you were previously using the vcd_toolkit**
 
-* TODO - should document creating a simple VM or 2 for testing.
-* check if DHCP is up:  From a VM `sudo nmap --script broadcast-dhcp-discover`
-    This should return you a DHCPOFFER.  If not, DHCP is not configured and enabled on the edge.  Confirm the ip offered, netmask, router/gateway, and DNS server.  For example:
-
-```
-Starting Nmap 6.40 ( http://nmap.org ) at 2020-08-25 15:38 EDT
-Pre-scan script results:
-| broadcast-dhcp-discover:
-|   IP Offered: 172.16.0.151
-|   DHCP Message Type: DHCPOFFER
-|   Server Identifier: 169.254.1.73
-|   IP Address Lease Time: 0 days, 0:05:00
-|   Subnet Mask: 255.255.255.0
-|   Router: 172.16.0.1
-|_  Domain Name Server: 172.16.0.10
-```
 
 
 ## Create and configure Bastion VM
@@ -355,20 +327,16 @@ terraform apply
 | base_domain                | Base domain for your OpenShift Cluster                       | string | -                              |
 | machine_cidr | CIDR for your CoreOS VMs in `subnet/mask` format.            | string | -                              |
 | bootstrap_ip_address|IP Address for bootstrap node|string|-|
-| bootstrap_mac_address|MAC Address for bootstrap node|string|-|
-| control_plane_mac_addresses|List of mac addresses for your control plane nodes|list|-|
 | control_plane_count          | Number of control plane VMs to create                        | string | 3                |
 | control_plane_memory         | Memory, in MB, to allocate to control plane VMs              | string | 16384            |
 | control_plane_num_cpus| Number of CPUs to allocate for control plane VMs             |string|4|
 | control_disk  | size in MB   | string  |  - |
 | compute_ip_addresses|List of IP addresses for your compute nodes|list|-|
-| compute_mac_addresses|List of MAC addresses for your compute nodes|list|-|
 | compute_count|Number of compute VMs to create|string|3|
 | compute_memory|Memory, in MB, to allocate to compute VMs|string|8192|
 | compute_num_cpus|Number of CPUs to allocate for compute VMs|string|3|
 | compute_disk  | size in MB   | string  |  - |
 | storage_ip_addresses|List of IP addresses for your storage nodes|list|`Empty`|
-| storage_mac_addresses|List of MAC addresses for your storage nodes|list|`Empty`|
 | storage_count|Number of storage VMs to create|string|0|
 | storage_memory               | Memory, in MB to allocate to storage VMs                     | string | 65536            |
 | storage_num_cpus             | Number of CPUs to allocate for storage VMs                   | string | 16               |
@@ -380,7 +348,6 @@ terraform apply
 | openshift_cluster_cidr       | CIDR for pods in the OpenShift SDN                           | string | 10.128.0.0/14    |
 | openshift_service_cidr       | CIDR for services in the OpenShift SDN                       | string | 172.30.0.0/16    |
 | openshift_host_prefix        | Controls the number of pods to allocate to each node from the `openshift_cluster_cidr` CIDR. For example, 23 would allocate 2^(32-23) 512 pods to each node. | string | 23               |
-| openshift_version            | Version of OpenShift to install. 4.6 or later.               | string | 4.6              |
 | create_loadbalancer_vm | Create the LoadBalancer VM and use it as a DNS server for your cluster.  If set to `false` you must provide a valid pre-configured LoadBalancer for your `api` and `*.apps` endpoints and DNS Zone for your `cluster_id`.`base_domain`. | bool | false |
 
 ## Let OpenShift finish the installation:
