@@ -474,3 +474,8 @@ Next Bootstap installs an OCP control plane on itself, as well as an http server
 ### Enable Registry
  - [Enable the OCP Image registry using your NFS Storage](https://docs.openshift.com/container-platform/4.5/registry/configuring_registry_storage/configuring-registry-storage-baremetal.html)
  - [Exposing the Registry](https://docs.openshift.com/container-platform/4.5/registry/securing-exposing-registry.html)
+
+### Deleting Cluster (and reinstalling)
+`terraform destroy` will delete you cluster and remove all resources on VCD.  
+After 24 hours (or any changes to the terraform.tfvars file) you will need to remove the installer/cluster_id directory  
+`rm -rf installer/<your cluster id>`
