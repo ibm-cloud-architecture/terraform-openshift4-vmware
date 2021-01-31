@@ -73,6 +73,10 @@ variable "nested_hv_enabled" {
 variable "network_id" {
   type = string
 }
+variable "create_vms_only" {
+  type = bool
+  default = false
+}
 // variable "staticip_file_vm" {
 //  type = string
 // }

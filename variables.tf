@@ -192,10 +192,6 @@ variable "storage_ip_addresses" {
   default = []
 }
 
-variable "storage_mac_addresses" {
-  type    = list(string)
-  default = []
-}
 
 variable "storage_memory" {
   type    = string
@@ -258,3 +254,10 @@ variable "create_loadbalancer_vm" {
   description = "Create a LoadBalancer and DNS VM for your cluster"
   default     = false
 }
+
+variable "create_vms_only" {
+  type        = bool
+  description = "only create vms no OpenShift Install"
+  default     = false
+}
+

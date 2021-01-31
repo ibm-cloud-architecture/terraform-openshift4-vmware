@@ -177,4 +177,3 @@ data "local_file" "worker_ignition" {
     null_resource.generate_ignition
   ]
 }
-
