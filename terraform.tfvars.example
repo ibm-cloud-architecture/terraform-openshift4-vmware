@@ -103,3 +103,4 @@ vm_dns_addresses = ["172.16.0.10","9.9.9.9"]
 
 openshift_pull_secret = "~/.pull-secret"
 create_loadbalancer_vm = true
+create_vms_only = false
