@@ -37,6 +37,7 @@ For example if you are using dnsmasq as your DNS server:
     and in /etc/hosts:  
    `172.16.0.19 api-int.test-2w.cdastu.com`    
    `172.16.0.19 api.test-2w.cdastu.com`  
+   
 2. [CoreOS OVA](http://mirror.openshift.com/pub/openshift-v4/dependencies/rhcos/) must be uploaded to a VCD Catalog as a template.
 
 ## Installation Process
