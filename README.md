@@ -2,7 +2,11 @@
 
 **Unfortunately, the new capability of OpenShift 4.6 to pass Static IP's thru the ignition string `(guestinfo.afterburn.initrd.network-kargs="ip=<ip>::<gateway>:<netmask>:<hostname>:<iface>:none nameserver=srv1 [nameserver=srv2 [nameserver=srv3 [...]]]")` don't currently work in the VCD environment because the ignition strings depend on VMWare vm_advanced_config parameters, which aren't available in VCD. A bugzilla has been opened ([Bugzilla ID 1913791](https://bugzilla.redhat.com/show_bug.cgi?id=1913791)) but its really a VCD issue. To get around this issue, the best approach is to come up with a scheme for DHCP reservations for the OpenShift servers based on MAC address. There is now a DHCP Server that runs on the LoadBalancer VM. This means you can't use DHCP in the Edge Gateway for the subnet you are using. If you start DHCP services in the Edge Gateway, make sure you don't include this subnet.**
 
-**The Loadbalancer VM will be automatically started at install time to ensure that DHCP and DNS are ready when the other machines are started.**  
+**Change History:**
+- 2/01/2021 - Added "Experimental Flag" "create_vms_only". If you set this flag to true, OCP won't be installed, the vm's will be created and the OCP installer will be loaded to the installer/cluster_id directory. There is currently a bug so when you run `terraform apply` the first time, it fails with some error messages after creation of a few VM's but just run `terraform apply` again and it should complete successfully
+
+- 1/25/2021 - The Loadbalancer VM will be automatically started at install time to ensure that DHCP and DNS are ready when the other machines are started.  
+
 
 The benefits of this code vs. the VCD Toolkit are:
   - vcd toolkit doesn't update LB haproxy.cfg file properly if you change the number of nodes. You have to manually update.
@@ -37,7 +41,7 @@ For example if you are using dnsmasq as your DNS server:
     and in /etc/hosts:  
    `172.16.0.19 api-int.test-2w.cdastu.com`    
    `172.16.0.19 api.test-2w.cdastu.com`  
-   
+
 2. [CoreOS OVA](http://mirror.openshift.com/pub/openshift-v4/dependencies/rhcos/) must be uploaded to a VCD Catalog as a template.
 
 ## Installation Process
