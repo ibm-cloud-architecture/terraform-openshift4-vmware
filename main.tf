@@ -60,13 +60,13 @@ resource "tls_private_key" "installkey" {
 
 resource "local_file" "write_private_key" {
   content         = tls_private_key.installkey.private_key_pem
-  filename        = "${path.root}/artifacts/openshift_rsa"
+  filename        = "${path.root}/installer/${var.cluster_id}/sshkeys/openshift_rsa"
   file_permission = 0600
 }
 
 resource "local_file" "write_public_key" {
   content         = tls_private_key.installkey.public_key_openssh
-  filename        = "${path.root}/artifacts/openshift_rsa.pub"
+  filename        = "${path.root}/installer/${var.cluster_id}/sshkeys/openshift_rsa.pub"
   file_permission = 0600
 }
 
@@ -118,6 +118,7 @@ module "bootstrap" {
   num_cpus      = 2
   memory        = 8192
   dns_addresses = var.vm_dns_addresses
+  vm_gateway    = var.vm_gateway == null ? cidrhost(var.machine_cidr, 1) : var.vm_gateway
 }
 
 module "control_plane_vm" {
@@ -145,6 +146,7 @@ module "control_plane_vm" {
   num_cpus      = var.control_plane_num_cpus
   memory        = var.control_plane_memory
   dns_addresses = var.vm_dns_addresses
+  vm_gateway    = var.vm_gateway == null ? cidrhost(var.machine_cidr, 1) : var.vm_gateway
 }
 
 module "compute_vm" {
@@ -172,6 +174,7 @@ module "compute_vm" {
   num_cpus      = var.compute_num_cpus
   memory        = var.compute_memory
   dns_addresses = var.vm_dns_addresses
+  vm_gateway    = var.vm_gateway == null ? cidrhost(var.machine_cidr, 1) : var.vm_gateway
 }
 
 module "storage_vm" {
@@ -199,5 +202,6 @@ module "storage_vm" {
   num_cpus      = var.storage_num_cpus
   memory        = var.storage_memory
   dns_addresses = var.vm_dns_addresses
+  vm_gateway    = var.vm_gateway == null ? cidrhost(var.machine_cidr, 1) : var.vm_gateway
 }
 

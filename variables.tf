@@ -49,6 +49,12 @@ variable "vm_dns_addresses" {
   default     = ["8.8.8.8", "8.8.4.4"]
 }
 
+variable "vm_gateway" {
+  type        = string
+  description = "IP Address to use for VM default gateway.  If not set, default is the first host in the CIDR range"
+  default     = null
+}
+
 /////////
 // OpenShift cluster variables
 /////////

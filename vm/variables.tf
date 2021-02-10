@@ -73,3 +73,8 @@ variable "nested_hv_enabled" {
   type    = bool
   default = false
 }
+
+variable "vm_gateway" {
+  type    = string
+  default = null
+}

@@ -58,10 +58,14 @@ compute_ip_addresses = ["192.168.100.84", "192.168.100.85", "192.168.100.86"]
 // The IP addresses of your DNS servers for your OpenShift nodes
 vm_dns_addresses = ["9.42.106.2", "9.42.106.3"]
 
+// The IP address of the default gateway.  If not set, it will use the frist host of the machine_cidr range.
+// vm_gateway = "192.168.100.254"
+
 // Path to your OpenShift Pull Secret
 openshift_pull_secret = "~/.pull-secret"
 
-// Set to true so that OpenShift self-hosts its own LoadBalancer (similar to IPI deployments)
+// Set to true (default) so that OpenShift self-hosts its own LoadBalancers (similar to IPI deployments)
+// If set to false, you must bring your own LoadBalancers and point the api enpoint to masters and apps endpoint to workers
 create_openshift_vips = true
 
 // The number of storage VMs to create. Default is 0.  Set to 0 or 3
@@ -70,4 +74,4 @@ create_openshift_vips = true
 
 // The IP addresses to assign to the storage VMs. The length of this list must
 // match the value of storage_count.
-storage_ip_addresses = ["192.168.100.87", "192.168.100.88", "192.168.100.89"]
+//storage_ip_addresses = ["192.168.100.87", "192.168.100.88", "192.168.100.89"]
