@@ -61,15 +61,31 @@ variable "vsphere_server" {
   type = string
 }
 
+variable "vsphere_network" {
+  type = string
+}
+
+variable "vsphere_cluster" {
+  type = string
+}
+
 variable "vsphere_username" {
   type = string
 }
 
 variable "openshift_version" {
   type    = string
-  default = "4.6"
+  default = "4.6.16"
 }
 
 variable "total_node_count" {
   type = number
+}
+
+variable "api_vip" {
+  type = string
+}
+
+variable "ingress_vip" {
+  type = string
 }

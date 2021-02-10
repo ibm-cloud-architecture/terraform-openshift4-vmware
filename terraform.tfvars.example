@@ -55,16 +55,19 @@ control_plane_ip_addresses = ["192.168.100.81", "192.168.100.82", "192.168.100.8
 // match the value of compute_count.
 compute_ip_addresses = ["192.168.100.84", "192.168.100.85", "192.168.100.86"]
 
-// The IP address to assign to the loadbalancer VM.
-lb_ip_address = "192.168.100.79"
-
-// The IP address to assign to the public loadbalancer interface
-loadbalancer_lb_ip_address = "9.42.67.139"
-loadbalancer_lb_machine_cidr = "9.42.67.128/25"
-
+// The IP addresses of your DNS servers for your OpenShift nodes
 vm_dns_addresses = ["9.42.106.2", "9.42.106.3"]
 
+// Path to your OpenShift Pull Secret
 openshift_pull_secret = "~/.pull-secret"
-create_loadbalancer_vm = true
-storage_count = 3
+
+// Set to true so that OpenShift self-hosts its own LoadBalancer (similar to IPI deployments)
+create_openshift_vips = true
+
+// The number of storage VMs to create. Default is 0.  Set to 0 or 3
+// storage_count = 3
+
+
+// The IP addresses to assign to the storage VMs. The length of this list must
+// match the value of storage_count.
 storage_ip_addresses = ["192.168.100.87", "192.168.100.88", "192.168.100.89"]

@@ -37,6 +37,10 @@ platform:
     password: ${var.vsphere_password}
     datacenter: ${var.vsphere_datacenter}
     defaultDatastore: ${var.vsphere_datastore}
+    network: ${var.vsphere_network}
+    cluster: ${var.vsphere_cluster}
+%{if var.api_vip != ""}    apiVIP: ${var.api_vip}%{endif}
+%{if var.ingress_vip != ""}    ingressVIP: ${var.ingress_vip}%{endif}
 pullSecret: '${chomp(file(var.pull_secret))}'
 sshKey: '${var.ssh_public_key}'
 EOF
@@ -81,7 +85,7 @@ resource "null_resource" "download_binaries" {
 set -ex
 test -e ${local.installerdir} || mkdir -p ${local.installerdir}
 if [[ $(uname -s) == "Darwin" ]]; then PLATFORM="mac"; else PLATFOMR="linux"; fi
-curl -o ${local.installerdir}/openshift-installer.tar.gz https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/latest-${var.openshift_version}/openshift-install-$PLATFORM.tar.gz
+curl -o ${local.installerdir}/openshift-installer.tar.gz https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/${var.openshift_version}/openshift-install-$PLATFORM.tar.gz
 tar -xf ${local.installerdir}/openshift-installer.tar.gz -C ${local.installerdir}
 EOF
   }

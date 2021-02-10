@@ -43,12 +43,6 @@ variable "vm_network" {
   default     = "VM Network"
 }
 
-variable "loadbalancer_network" {
-  type        = string
-  description = "This is the name of the loadbalancer network for cluster ingress and access"
-  default     = ""
-}
-
 variable "vm_dns_addresses" {
   type        = list(string)
   description = "List of DNS servers to use for your OpenShift Nodes"
@@ -77,11 +71,6 @@ variable "machine_cidr" {
 // Bootstrap machine variables
 /////////
 variable "bootstrap_ip_address" {
-  type    = string
-  default = ""
-}
-
-variable "lb_ip_address" {
   type    = string
   default = ""
 }
@@ -157,19 +146,15 @@ variable "storage_num_cpus" {
   type    = string
   default = "16"
 }
-//////////
-// loadbalancer machine variables
-// used to configure an extra nic for the loadbalancer
-//////////
 
-variable "loadbalancer_lb_ip_address" {
-  type    = string
-  default = ""
+variable "openshift_api_virtualip" {
+  type        = string
+  description = "Virtual IP used to access the cluster API."
 }
 
-variable "loadbalancer_lb_machine_cidr" {
-  type    = string
-  default = ""
+variable "openshift_ingress_virtualip" {
+  type        = string
+  description = "Virtual IP used for cluster ingress traffic."
 }
 
 variable "openshift_pull_secret" {
@@ -194,11 +179,12 @@ variable "openshift_host_prefix" {
 variable "openshift_version" {
   type        = string
   description = "Specify the OpenShift version you want to deploy.  Must be 4.6 or later to use this automation"
-  default     = "4.6"
+  default     = "4.6.16"
 }
 
-variable "create_loadbalancer_vm" {
-  type        = bool
-  description = "Create a LoadBalancer and DNS VM for your cluster"
-  default     = false
+variable "create_openshift_vips" {
+  type = bool
+  # https://github.com/openshift/installer/blob/master/docs/user/vsphere/vips-dns.md
+  description = "Deploy OpenShift with self contained LoadBalancer"
+  default     = true
 }
