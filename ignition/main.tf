@@ -84,7 +84,7 @@ resource "null_resource" "download_binaries" {
     command = <<EOF
 set -ex
 test -e ${local.installerdir} || mkdir -p ${local.installerdir}
-if [[ $(uname -s) == "Darwin" ]]; then PLATFORM="mac"; else PLATFOMR="linux"; fi
+if [[ $(uname -s) == "Darwin" ]]; then PLATFORM="mac"; else PLATFORM="linux"; fi
 curl -o ${local.installerdir}/openshift-installer.tar.gz https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/${var.openshift_version}/openshift-install-$PLATFORM.tar.gz
 tar -xf ${local.installerdir}/openshift-installer.tar.gz -C ${local.installerdir}
 EOF
