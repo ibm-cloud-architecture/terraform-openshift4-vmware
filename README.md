@@ -48,6 +48,7 @@ terraform apply
 | vm_template                  | Name of CoreOS OVA template from prereq #2                   | string | - |
 | vm_network                   | vSphere Network for OpenShift nodes                          | string | - |
 | vm_dns_addresses             | List of DNS servers to use for your OpenShift Nodes          | list   | 8.8.8.8, 8.8.4.4 |
+| vm_gateway                   | IP Address of default gateway.  If not set, defaults to first host in machine_cidr | string | null |
 | cluster_id                   | This cluster id must be of max length 27 and must have only alphanumeric or hyphen characters. | string | - |
 | base_domain                  | Base domain for your OpenShift Cluster                       | string | - |
 | machine_cidr                 | CIDR for your CoreOS VMs in `subnet/mask` format.            | string | - |
