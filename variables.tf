@@ -194,3 +194,15 @@ variable "create_openshift_vips" {
   description = "Deploy OpenShift with self contained LoadBalancer"
   default     = true
 }
+
+variable "ssh_public_key" {
+  type        = string
+  description = "Path to your ssh public key.  If left blank we will generate one."
+  default     = ""
+}
+
+variable "vsphere_preexisting_folder" {
+  type        = bool
+  description = "If false, creates a top-level folder with the name from vsphere_folder_rel_path."
+  default     = false
+}

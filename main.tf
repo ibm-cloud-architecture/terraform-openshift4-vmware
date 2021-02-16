@@ -9,6 +9,7 @@ locals {
   control_plane_fqdns = [for idx in range(var.control_plane_count) : "control-plane-${idx}.${local.cluster_domain}"]
   compute_fqdns       = [for idx in range(var.compute_count) : "compute-${idx}.${local.cluster_domain}"]
   storage_fqdns       = [for idx in range(var.storage_count) : "storage-${idx}.${local.cluster_domain}"]
+  ssh_public_key      = var.ssh_public_key == "" ? chomp(tls_private_key.installkey[0].public_key_openssh) : chomp(file(pathexpand(var.ssh_public_key)))
 }
 
 provider "vsphere" {
@@ -54,25 +55,28 @@ resource "vsphere_folder" "folder" {
 }
 
 resource "tls_private_key" "installkey" {
+  count     = var.ssh_public_key == "" ? 1 : 0
   algorithm = "RSA"
   rsa_bits  = 4096
 }
 
 resource "local_file" "write_private_key" {
-  content         = tls_private_key.installkey.private_key_pem
+  count           = var.ssh_public_key == "" ? 1 : 0
+  content         = tls_private_key.installkey[0].private_key_pem
   filename        = "${path.root}/installer/${var.cluster_id}/sshkeys/openshift_rsa"
   file_permission = 0600
 }
 
 resource "local_file" "write_public_key" {
-  content         = tls_private_key.installkey.public_key_openssh
+  count           = var.ssh_public_key == "" ? 1 : 0
+  content         = tls_private_key.installkey[0].public_key_openssh
   filename        = "${path.root}/installer/${var.cluster_id}/sshkeys/openshift_rsa.pub"
   file_permission = 0600
 }
 
 module "ignition" {
   source              = "./ignition"
-  ssh_public_key      = chomp(tls_private_key.installkey.public_key_openssh)
+  ssh_public_key      = local.ssh_public_key
   base_domain         = var.base_domain
   cluster_id          = var.cluster_id
   cluster_cidr        = var.openshift_cluster_cidr
