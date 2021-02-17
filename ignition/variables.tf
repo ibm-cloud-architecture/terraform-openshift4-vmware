@@ -73,9 +73,12 @@ variable "vsphere_username" {
   type = string
 }
 
+variable "vsphere_folder" {
+  type = string
+}
+
 variable "openshift_version" {
-  type    = string
-  default = "4.6.16"
+  type = string
 }
 
 variable "total_node_count" {

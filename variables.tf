@@ -206,3 +206,20 @@ variable "vsphere_preexisting_folder" {
   description = "If false, creates a top-level folder with the name from vsphere_folder_rel_path."
   default     = false
 }
+
+variable "vsphere_folder" {
+  type        = string
+  description = "The relative path to the folder which should be used or created for VMs."
+  default     = ""
+}
+
+variable "vsphere_preexisting_resourcepool" {
+  description = "If false, creates a resource pool for OpenShift nodes."
+  default     = false
+}
+
+variable "vsphere_resource_pool" {
+  type        = string
+  description = "The resource pool that should be used or created for VMs"
+  default     = ""
+}

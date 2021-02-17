@@ -39,6 +39,7 @@ platform:
     defaultDatastore: ${var.vsphere_datastore}
     network: ${var.vsphere_network}
     cluster: ${var.vsphere_cluster}
+%{if var.vsphere_folder != ""}    folder: /${var.vsphere_datacenter}/vm/${var.vsphere_folder}%{endif}
 %{if var.api_vip != ""}    apiVIP: ${var.api_vip}%{endif}
 %{if var.ingress_vip != ""}    ingressVIP: ${var.ingress_vip}%{endif}
 pullSecret: '${chomp(file(var.pull_secret))}'

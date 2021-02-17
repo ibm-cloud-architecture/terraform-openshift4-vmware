@@ -10,6 +10,8 @@ locals {
   compute_fqdns       = [for idx in range(var.compute_count) : "compute-${idx}.${local.cluster_domain}"]
   storage_fqdns       = [for idx in range(var.storage_count) : "storage-${idx}.${local.cluster_domain}"]
   ssh_public_key      = var.ssh_public_key == "" ? chomp(tls_private_key.installkey[0].public_key_openssh) : chomp(file(pathexpand(var.ssh_public_key)))
+  folder_path         = var.vsphere_folder == "" ? var.cluster_id : var.vsphere_folder
+  resource_pool_id    = var.vsphere_preexisting_resourcepool ? data.vsphere_resource_pool.resource_pool[0].id : vsphere_resource_pool.resource_pool[0].id
 }
 
 provider "vsphere" {
@@ -44,31 +46,45 @@ data "vsphere_virtual_machine" "template" {
 }
 
 resource "vsphere_resource_pool" "resource_pool" {
-  name                    = var.cluster_id
+  count = var.vsphere_preexisting_resourcepool ? 0 : 1
+
+  name                    = var.vsphere_resource_pool == "" ? var.cluster_id : var.vsphere_resource_pool
   parent_resource_pool_id = data.vsphere_compute_cluster.compute_cluster.resource_pool_id
 }
 
+data "vsphere_resource_pool" "resource_pool" {
+  count = var.vsphere_preexisting_resourcepool ? 1 : 0
+
+  name          = var.vsphere_resource_pool
+  datacenter_id = data.vsphere_datacenter.dc.id
+}
+
 resource "vsphere_folder" "folder" {
-  path          = var.cluster_id
+  count = var.vsphere_preexisting_folder ? 0 : 1
+
+  path          = var.vsphere_folder == "" ? var.cluster_id : var.vsphere_folder
   type          = "vm"
   datacenter_id = data.vsphere_datacenter.dc.id
 }
 
 resource "tls_private_key" "installkey" {
-  count     = var.ssh_public_key == "" ? 1 : 0
+  count = var.ssh_public_key == "" ? 1 : 0
+
   algorithm = "RSA"
   rsa_bits  = 4096
 }
 
 resource "local_file" "write_private_key" {
-  count           = var.ssh_public_key == "" ? 1 : 0
+  count = var.ssh_public_key == "" ? 1 : 0
+
   content         = tls_private_key.installkey[0].private_key_pem
   filename        = "${path.root}/installer/${var.cluster_id}/sshkeys/openshift_rsa"
   file_permission = 0600
 }
 
 resource "local_file" "write_public_key" {
-  count           = var.ssh_public_key == "" ? 1 : 0
+  count = var.ssh_public_key == "" ? 1 : 0
+
   content         = tls_private_key.installkey[0].public_key_openssh
   filename        = "${path.root}/installer/${var.cluster_id}/sshkeys/openshift_rsa.pub"
   file_permission = 0600
@@ -90,6 +106,7 @@ module "ignition" {
   vsphere_datastore   = var.vsphere_datastore
   vsphere_cluster     = var.vsphere_cluster
   vsphere_network     = var.vm_network
+  vsphere_folder      = local.folder_path
   api_vip             = var.create_openshift_vips ? var.openshift_api_virtualip : ""
   ingress_vip         = var.create_openshift_vips ? var.openshift_ingress_virtualip : ""
   pull_secret         = var.openshift_pull_secret
@@ -107,11 +124,11 @@ module "bootstrap" {
     [var.bootstrap_ip_address]
   )
 
-  resource_pool_id      = vsphere_resource_pool.resource_pool.id
+  resource_pool_id      = local.resource_pool_id
   datastore_id          = data.vsphere_datastore.datastore.id
   datacenter_id         = data.vsphere_datacenter.dc.id
   network_id            = data.vsphere_network.network.id
-  folder_id             = vsphere_folder.folder.path
+  folder_id             = local.folder_path
   guest_id              = data.vsphere_virtual_machine.template.guest_id
   template_uuid         = data.vsphere_virtual_machine.template.id
   disk_thin_provisioned = data.vsphere_virtual_machine.template.disks[0].thin_provisioned
@@ -135,11 +152,11 @@ module "control_plane_vm" {
 
   ignition = module.ignition.master_ignition
 
-  resource_pool_id      = vsphere_resource_pool.resource_pool.id
+  resource_pool_id      = local.resource_pool_id
   datastore_id          = data.vsphere_datastore.datastore.id
   datacenter_id         = data.vsphere_datacenter.dc.id
   network_id            = data.vsphere_network.network.id
-  folder_id             = vsphere_folder.folder.path
+  folder_id             = local.folder_path
   guest_id              = data.vsphere_virtual_machine.template.guest_id
   template_uuid         = data.vsphere_virtual_machine.template.id
   disk_thin_provisioned = data.vsphere_virtual_machine.template.disks[0].thin_provisioned
@@ -163,11 +180,11 @@ module "compute_vm" {
 
   ignition = module.ignition.worker_ignition
 
-  resource_pool_id      = vsphere_resource_pool.resource_pool.id
+  resource_pool_id      = local.resource_pool_id
   datastore_id          = data.vsphere_datastore.datastore.id
   datacenter_id         = data.vsphere_datacenter.dc.id
   network_id            = data.vsphere_network.network.id
-  folder_id             = vsphere_folder.folder.path
+  folder_id             = local.folder_path
   guest_id              = data.vsphere_virtual_machine.template.guest_id
   template_uuid         = data.vsphere_virtual_machine.template.id
   disk_thin_provisioned = data.vsphere_virtual_machine.template.disks[0].thin_provisioned
@@ -191,11 +208,11 @@ module "storage_vm" {
 
   ignition = module.ignition.worker_ignition
 
-  resource_pool_id      = vsphere_resource_pool.resource_pool.id
+  resource_pool_id      = local.resource_pool_id
   datastore_id          = data.vsphere_datastore.datastore.id
   datacenter_id         = data.vsphere_datacenter.dc.id
   network_id            = data.vsphere_network.network.id
-  folder_id             = vsphere_folder.folder.path
+  folder_id             = local.folder_path
   guest_id              = data.vsphere_virtual_machine.template.guest_id
   template_uuid         = data.vsphere_virtual_machine.template.id
   disk_thin_provisioned = data.vsphere_virtual_machine.template.disks[0].thin_provisioned
