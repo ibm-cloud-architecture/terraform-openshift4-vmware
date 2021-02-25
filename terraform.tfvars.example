@@ -68,6 +68,11 @@ openshift_pull_secret = "~/.pull-secret"
 // If set to false, you must bring your own LoadBalancers and point the api enpoint to masters and apps endpoint to workers
 create_openshift_vips = true
 
+// If create_openshift_vips is set to true, you must provide the IP addresses that will be used for the api and *.apps endpoints
+// These IP addresses MUST be on the same CIDR range as machine_cidr
+openshift_api_virtualip = "192.168.100.201"
+openshift_ingress_virtualip = "192.168.100.200"
+
 // The number of storage VMs to create. Default is 0.  Set to 0 or 3
 // storage_count = 3
 
