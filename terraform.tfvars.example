@@ -29,7 +29,7 @@ vm_template = "rhcos-4.6-template"
 vm_network = "vdpg-192.168.100"
 
 // Name of the VM Network for loadbalancer NIC in loadbalancer.
-loadbalancer_network = "vDPortGroup"
+// loadbalancer_network = "vDPortGroup"
 
 // The machine_cidr where IP addresses will be assigned for cluster nodes.
 // Additionally, IPAM will assign IPs based on the network ID. 
