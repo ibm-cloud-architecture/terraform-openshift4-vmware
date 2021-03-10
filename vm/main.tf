@@ -19,15 +19,6 @@ resource "vsphere_virtual_machine" "vm" {
   folder           = var.folder_id
   enable_disk_uuid = "true"
 
-  wait_for_guest_net_timeout  = "0"
-  wait_for_guest_net_routable = "false"
-
-  nested_hv_enabled = var.nested_hv_enabled
-
-  network_interface {
-    network_id = var.network_id
-  }
-
   dynamic "disk" {
     for_each = local.disk_sizes
     content {
@@ -36,6 +27,15 @@ resource "vsphere_virtual_machine" "vm" {
       thin_provisioned = var.disk_thin_provisioned
       unit_number      = disk.key
     }
+  }
+
+  wait_for_guest_net_timeout  = "0"
+  wait_for_guest_net_routable = "false"
+
+  nested_hv_enabled = var.nested_hv_enabled
+
+  network_interface {
+    network_id = var.network_id
   }
 
   clone {

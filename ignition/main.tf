@@ -14,11 +14,11 @@ controlPlane:
   platform:
     vsphere:
       coresPerSocket: 1
-      cpus: ${var.master_cpu}
-      memoryMB: ${var.master_memory}
+      cpus: ${var.control_plane_num_cpus}
+      memoryMB: ${var.control_plane_memory}
       osDisk:
-        diskSizeGB: ${var.master_disk_size}
-  replicas: 3
+        diskSizeGB: ${var.control_plane_disk_size}
+  replicas: ${var.control_plane_count}
 metadata:
   name: ${var.cluster_id}
 networking:

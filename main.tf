@@ -138,6 +138,7 @@ module "bootstrap" {
 
   num_cpus      = 2
   memory        = 8192
+  disk_size     = 60
   dns_addresses = var.vm_dns_addresses
   vm_gateway    = var.vm_gateway == null ? cidrhost(var.machine_cidr, 1) : var.vm_gateway
 }
@@ -166,6 +167,7 @@ module "control_plane_vm" {
 
   num_cpus      = var.control_plane_num_cpus
   memory        = var.control_plane_memory
+  disk_size     = var.control_plane_disk_size
   dns_addresses = var.vm_dns_addresses
   vm_gateway    = var.vm_gateway == null ? cidrhost(var.machine_cidr, 1) : var.vm_gateway
 }
@@ -194,6 +196,7 @@ module "compute_vm" {
 
   num_cpus      = var.compute_num_cpus
   memory        = var.compute_memory
+  disk_size     = var.compute_disk_size
   dns_addresses = var.vm_dns_addresses
   vm_gateway    = var.vm_gateway == null ? cidrhost(var.machine_cidr, 1) : var.vm_gateway
 }
@@ -222,6 +225,7 @@ module "storage_vm" {
 
   num_cpus      = var.storage_num_cpus
   memory        = var.storage_memory
+  disk_size     = var.storage_disk_size
   dns_addresses = var.vm_dns_addresses
   vm_gateway    = var.vm_gateway == null ? cidrhost(var.machine_cidr, 1) : var.vm_gateway
 }

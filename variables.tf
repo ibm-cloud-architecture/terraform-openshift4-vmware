@@ -104,6 +104,11 @@ variable "control_plane_num_cpus" {
   default = "4"
 }
 
+variable "control_plane_disk_size" {
+  type    = number 
+  default = 60
+}
+
 //////////
 // compute machine variables
 //////////
@@ -129,6 +134,11 @@ variable "compute_num_cpus" {
   default = "4"
 }
 
+variable "compute_disk_size" {
+  type    = number
+  default = 60  
+}
+
 //////////
 // storage machine variables
 //////////
@@ -151,6 +161,11 @@ variable "storage_memory" {
 variable "storage_num_cpus" {
   type    = string
   default = "16"
+}
+
+variable "storage_disk_size" {
+  type    = number
+  default = 120
 }
 
 variable "openshift_api_virtualip" {
