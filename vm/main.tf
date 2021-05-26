@@ -1,5 +1,5 @@
 locals {
-  disks = compact(list(var.disk_size, var.extra_disk_size == 0 ? "" : var.extra_disk_size))
+  disks = compact(tolist([var.disk_size, var.extra_disk_size == 0 ? "" : var.extra_disk_size]))
   disk_sizes = zipmap(
     range(length(local.disks)),
     local.disks
