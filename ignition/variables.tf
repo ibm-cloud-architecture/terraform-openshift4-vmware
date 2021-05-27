@@ -38,24 +38,9 @@ variable "control_plane_num_cpus" {
 }
 
 variable "control_plane_disk_size" {
-  type    = number 
+  type    = number
   default = 120
 }
-
-//variable "master_cpu" {
-//  type    = string
-//  default = 8
-//}
-
-//variable "master_disk_size" {
-//  type    = string
-//  default = 120
-//}
-
-//variable "master_memory" {
-//  type    = string
-//  default = 32768
-//}
 
 variable "pull_secret" {
   type = string
@@ -111,4 +96,14 @@ variable "api_vip" {
 
 variable "ingress_vip" {
   type = string
+}
+
+variable "worker_mtu" {
+  type    = number
+  default = 1450
+}
+
+variable "default_interface" {
+  type    = string
+  default = "ens192"
 }

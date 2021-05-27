@@ -105,7 +105,7 @@ variable "control_plane_num_cpus" {
 }
 
 variable "control_plane_disk_size" {
-  type    = number 
+  type    = number
   default = 60
 }
 
@@ -136,7 +136,7 @@ variable "compute_num_cpus" {
 
 variable "compute_disk_size" {
   type    = number
-  default = 60  
+  default = 60
 }
 
 //////////
@@ -237,4 +237,10 @@ variable "vsphere_resource_pool" {
   type        = string
   description = "The resource pool that should be used or created for VMs"
   default     = ""
+}
+
+variable "openshift_worker_mtu" {
+  type        = number
+  description = "The NIC MTU to be used for compute OpenShift VMs"
+  default     = 1450
 }

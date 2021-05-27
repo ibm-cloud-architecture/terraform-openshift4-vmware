@@ -81,3 +81,4 @@ terraform apply
 | openshift_api_virtualip          | The IP Address that will be used for the `api` LoadBalanced endpoint.  Must be on the same CIDR range as the master nodes | string | - |
 | openshift_ingress_virtualip      | The IP Address that will be used for the `*.apps` LoadBalanced endpoint.  Must be on the same CIDR range as the worker nodes | string | - |
 | ssh_public_key                   | Path to your ssh public key.  If left blank we will generate one. | string | - |
+| openshift_worker_mtu | Set the NIC MTU value of your worker nodes | number | 1450 |

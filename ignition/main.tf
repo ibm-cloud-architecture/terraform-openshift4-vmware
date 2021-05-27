@@ -76,6 +76,54 @@ data "template_file" "post_deployment_06" {
   })
 }
 
+
+data "template_file" "mtu_script" {
+  template = templatefile("${path.module}/templates/30-mtu", {
+    mtu       = var.worker_mtu
+    interface = var.default_interface
+  })
+}
+
+data "template_file" "mtu_machineconfig" {
+  template = <<EOF
+kind: MachineConfig
+apiVersion: machineconfiguration.openshift.io/v1
+metadata:
+  name: 99-worker-mtu
+  creationTimestamp: 
+  labels:
+    machineconfiguration.openshift.io/role: worker
+spec:
+  osImageURL: ''
+  config:
+    ignition:
+      version: 3.1.0
+    storage:
+      files:
+      - filesystem: root
+        path: "/etc/NetworkManager/dispatcher.d/30-mtu"
+        contents:
+          source: data:text/plain;charset=utf-8;base64,${base64encode(data.template_file.mtu_script.rendered)}
+          verification: {}
+        mode: 0755
+    systemd:
+      units:
+        - contents: |
+            [Unit]
+            Requires=systemd-udevd.target
+            After=systemd-udevd.target
+            Before=NetworkManager.service
+            DefaultDependencies=no
+            [Service]
+            Type=oneshot
+            ExecStart=/usr/sbin/restorecon /etc/NetworkManager/dispatcher.d/30-mtu
+            [Install]
+            WantedBy=multi-user.target
+          name: one-shot-mtu.service
+          enabled: true
+EOF
+}
+
 locals {
   installerdir = "${path.root}/installer/${var.cluster_id}"
 }
@@ -137,6 +185,14 @@ resource "local_file" "post_deployment_05" {
 resource "local_file" "post_deployment_06" {
   content  = data.template_file.post_deployment_06.rendered
   filename = "${local.installerdir}/manifests/99_06-post-deployment.yaml"
+  depends_on = [
+    null_resource.generate_manifests,
+  ]
+}
+
+resource "local_file" "mtu_configuration" {
+  content  = data.template_file.mtu_machineconfig.rendered
+  filename = "${local.installerdir}/manifests/99_worker_mtu-machineconfig.yaml"
   depends_on = [
     null_resource.generate_manifests,
   ]

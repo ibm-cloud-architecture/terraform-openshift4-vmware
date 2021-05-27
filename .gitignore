@@ -19,3 +19,4 @@ makefile
 **/artifacts/*
 **/terraform.tfstate.d/*
 **/installer/*
+.terraform.lock.hcl

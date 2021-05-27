@@ -1,0 +1,9 @@
+#!/bin/sh
+MTU=${mtu}
+INTERFACE=${interface}
+
+IFACE=$1
+STATUS=$2
+if [ "$IFACE" = "$INTERFACE" -a "$STATUS" = "up" ]; then
+    ip link set "$IFACE" mtu $MTU
+fi
