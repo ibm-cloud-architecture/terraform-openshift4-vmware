@@ -100,10 +100,15 @@ variable "ingress_vip" {
 
 variable "worker_mtu" {
   type    = number
-  default = 1450
+  default = 1500
 }
 
 variable "default_interface" {
   type    = string
   default = "ens192"
+}
+
+variable "ntp_server" {
+  type    = string
+  default = ""
 }

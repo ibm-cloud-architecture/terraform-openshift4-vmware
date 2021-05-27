@@ -242,5 +242,10 @@ variable "vsphere_resource_pool" {
 variable "openshift_worker_mtu" {
   type        = number
   description = "The NIC MTU to be used for compute OpenShift VMs"
-  default     = 1450
+  default     = 1500
+}
+
+variable "openshift_ntp_server" {
+  type    = string
+  default = ""
 }

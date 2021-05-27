@@ -124,6 +124,71 @@ spec:
 EOF
 }
 
+
+data "template_file" "chrony_config" {
+  template = templatefile("${path.module}/templates/chrony.conf", {
+    server = var.ntp_server
+  })
+}
+
+data "template_file" "chrony_config_masters" {
+  template = <<EOF
+apiVersion: machineconfiguration.openshift.io/v1
+kind: MachineConfig
+metadata:
+  labels:
+    machineconfiguration.openshift.io/role: master
+  name: 99-masters-chrony-configuration
+spec:
+  config:
+    ignition:
+      config: {}
+      security:
+        tls: {}
+      timeouts: {}
+      version: 3.1.0
+    networkd: {}
+    passwd: {}
+    storage:
+      files:
+        - contents:
+            source: data:text/plain;charset=utf-8;base64,${base64encode(data.template_file.chrony_config.rendered)}
+          mode: 420
+          overwrite: true
+          path: /etc/chrony.conf
+  osImageURL: ""
+EOF
+}
+
+data "template_file" "chrony_config_workers" {
+  template = <<EOF
+apiVersion: machineconfiguration.openshift.io/v1
+kind: MachineConfig
+metadata:
+  labels:
+    machineconfiguration.openshift.io/role: worker
+  name: 99-workers-chrony-configuration
+spec:
+  config:
+    ignition:
+      config: {}
+      security:
+        tls: {}
+      timeouts: {}
+      version: 3.1.0
+    networkd: {}
+    passwd: {}
+    storage:
+      files:
+        - contents:
+            source: data:text/plain;charset=utf-8;base64,${base64encode(data.template_file.chrony_config.rendered)}
+          mode: 420
+          overwrite: true
+          path: /etc/chrony.conf
+  osImageURL: ""
+EOF
+}
+
 locals {
   installerdir = "${path.root}/installer/${var.cluster_id}"
 }
@@ -191,8 +256,27 @@ resource "local_file" "post_deployment_06" {
 }
 
 resource "local_file" "mtu_configuration" {
+  count    = var.worker_mtu == 1500 ? 0 : 1
   content  = data.template_file.mtu_machineconfig.rendered
   filename = "${local.installerdir}/manifests/99_worker_mtu-machineconfig.yaml"
+  depends_on = [
+    null_resource.generate_manifests,
+  ]
+}
+
+resource "local_file" "ntp_masters" {
+  count    = var.ntp_server == "" ? 0 : 1
+  content  = data.template_file.mtu_machineconfig.rendered
+  filename = "${local.installerdir}/manifests/99_master_ntp-machineconfig.yaml"
+  depends_on = [
+    null_resource.generate_manifests,
+  ]
+}
+
+resource "local_file" "ntp_workers" {
+  count    = var.ntp_server == "" ? 0 : 1
+  content  = data.template_file.mtu_machineconfig.rendered
+  filename = "${local.installerdir}/manifests/99_worker_ntp-machineconfig.yaml"
   depends_on = [
     null_resource.generate_manifests,
   ]

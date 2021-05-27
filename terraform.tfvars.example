@@ -83,3 +83,6 @@ openshift_ingress_virtualip = "192.168.100.200"
 
 // Set MTU for worker VMs
 // openshift_worker_mtu = 9000
+
+// Set NTP server
+// openshift_ntp_serevr = vistime.rtp.raleigh.ibm.com

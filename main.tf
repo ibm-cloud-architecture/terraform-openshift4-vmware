@@ -113,6 +113,7 @@ module "ignition" {
   openshift_version   = var.openshift_version
   total_node_count    = var.compute_count + var.storage_count
   worker_mtu          = var.openshift_worker_mtu
+  ntp_server          = var.openshift_ntp_server
 }
 
 module "bootstrap" {
