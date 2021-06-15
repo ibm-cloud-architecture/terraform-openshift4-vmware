@@ -61,10 +61,15 @@ variable "dns_addresses" {
 
 variable "disk_size" {
   type    = number
-  default = 60
+  default = 120
 }
 
 variable "extra_disk_size" {
+  type    = number
+  default = 0
+}
+
+variable "storage_disk_size" {
   type    = number
   default = 0
 }

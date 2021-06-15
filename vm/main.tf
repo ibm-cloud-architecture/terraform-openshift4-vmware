@@ -1,5 +1,5 @@
 locals {
-  disks = compact(tolist([var.disk_size, var.extra_disk_size == 0 ? "" : var.extra_disk_size]))
+  disks = compact(tolist([var.disk_size, var.extra_disk_size == 0 ? "" : var.extra_disk_size, var.storage_disk_size == 0 ? "" : var.storage_disk_size]))
   disk_sizes = zipmap(
     range(length(local.disks)),
     local.disks
@@ -9,16 +9,29 @@ locals {
 resource "vsphere_virtual_machine" "vm" {
   for_each = var.hostnames_ip_addresses
 
+  lifecycle {
+    ignore_changes = [extra_config, disk]
+  }
+
   name = element(split(".", each.key), 0)
 
-  resource_pool_id = var.resource_pool_id
-  datastore_id     = var.datastore_id
-  num_cpus         = var.num_cpus
-  memory           = var.memory
-  guest_id         = var.guest_id
-  folder           = var.folder_id
-  enable_disk_uuid = "true"
-
+  resource_pool_id            = var.resource_pool_id
+  datastore_id                = var.datastore_id
+  num_cpus                    = var.num_cpus
+  memory                      = var.memory
+  guest_id                    = var.guest_id
+  folder                      = var.folder_id
+  enable_disk_uuid            = "true"
+  cpu_hot_add_enabled         = "true"
+  cpu_hot_remove_enabled      = "true"
+  memory_hot_add_enabled      = "true"
+  wait_for_guest_net_timeout  = "0"
+  wait_for_guest_net_routable = "false"
+  nested_hv_enabled           = var.nested_hv_enabled
+  
+  network_interface {
+    network_id = var.network_id
+  }
   dynamic "disk" {
     for_each = local.disk_sizes
     content {
@@ -27,15 +40,6 @@ resource "vsphere_virtual_machine" "vm" {
       thin_provisioned = var.disk_thin_provisioned
       unit_number      = disk.key
     }
-  }
-
-  wait_for_guest_net_timeout  = "0"
-  wait_for_guest_net_routable = "false"
-
-  nested_hv_enabled = var.nested_hv_enabled
-
-  network_interface {
-    network_id = var.network_id
   }
 
   clone {
