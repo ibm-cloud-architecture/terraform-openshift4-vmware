@@ -297,7 +297,7 @@ variable "openshift_host_prefix" {
 variable "openshift_version" {
   type        = string
   description = "Specify the OpenShift version you want to deploy.  Must be 4.6 or later to use this automation"
-  default     = "4.6.16"
+  default     = "4.6"
 }
 
 variable "create_openshift_vips" {
