@@ -18,6 +18,10 @@ variable "cluster_servicecidr" {
   type = string
 }
 
+variable "cluster_networktype" {
+  type = string
+}
+
 variable "machine_cidr" {
   type = string
 }
@@ -111,4 +115,9 @@ variable "default_interface" {
 variable "ntp_server" {
   type    = string
   default = ""
+}
+
+variable "create_openshift_vips" {
+  type    = bool
+  default = true
 }

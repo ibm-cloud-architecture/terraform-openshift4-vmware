@@ -104,6 +104,11 @@ variable "bootstrap_ip_address" {
   default = ""
 }
 
+variable "bootstrap_complete" {
+  type    = string
+  default = "false"
+}
+
 ///////////
 // control-plane machine variables
 ///////////
@@ -268,15 +273,22 @@ variable "storage_additional_disk_size" {
 variable "openshift_api_virtualip" {
   type        = string
   description = "Virtual IP used to access the cluster API."
+  default     = ""   
 }
 
 variable "openshift_ingress_virtualip" {
   type        = string
   description = "Virtual IP used for cluster ingress traffic."
+  default     = ""
 }
 
 variable "openshift_pull_secret" {
   type = string
+}
+
+variable openshift_network_type {
+  type = string
+  default = "OpenShiftSDN"
 }
 
 variable "openshift_cluster_cidr" {
@@ -297,7 +309,7 @@ variable "openshift_host_prefix" {
 variable "openshift_version" {
   type        = string
   description = "Specify the OpenShift version you want to deploy.  Must be 4.6 or later to use this automation"
-  default     = "4.6"
+  default     = "4.7"
 }
 
 variable "create_openshift_vips" {
@@ -324,7 +336,4 @@ variable "openshift_ntp_server" {
   default = ""
 }
 
-variable "bootstrap_complete" {
-  type    = string
-  default = "false"
-}
+

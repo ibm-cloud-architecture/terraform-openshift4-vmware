@@ -12,7 +12,7 @@ locals {
   storage_fqdns       = [for idx in range(var.storage_count) : "${var.storage_name}-${idx}.${local.cluster_domain}"]
   ssh_public_key      = var.ssh_public_key == "" ? chomp(tls_private_key.installkey[0].public_key_openssh) : chomp(file(pathexpand(var.ssh_public_key)))
   folder_path         = var.vsphere_folder == "" ? var.cluster_id : var.vsphere_folder
-//  resource_pool_id    = var.vsphere_preexisting_resourcepool ? data.vsphere_resource_pool.resource_pool[0].id : vsphere_resource_pool.resource_pool[0].id
+  //resource_pool_id    = var.vsphere_preexisting_resourcepool ? data.vsphere_resource_pool.resource_pool[0].id : vsphere_resource_pool.resource_pool[0].id
   resource_pool_id    = var.vsphere_preexisting_resourcepool ? var.vsphere_resource_pool == "" ? data.vsphere_compute_cluster.compute_cluster.resource_pool_id : data.vsphere_resource_pool.resource_pool[0].id : vsphere_resource_pool.resource_pool[0].id
 }
 
@@ -100,6 +100,7 @@ module "ignition" {
   cluster_cidr        = var.openshift_cluster_cidr
   cluster_hostprefix  = var.openshift_host_prefix
   cluster_servicecidr = var.openshift_service_cidr
+  cluster_networktype = var.openshift_network_type
   machine_cidr        = var.machine_cidr
   vsphere_server      = var.vsphere_server
   vsphere_username    = var.vsphere_user
@@ -113,7 +114,7 @@ module "ignition" {
   ingress_vip         = var.create_openshift_vips ? var.openshift_ingress_virtualip : ""
   pull_secret         = var.openshift_pull_secret
   openshift_version   = var.openshift_version
-  total_node_count    = var.compute_count + var.storage_count
+  total_node_count    = var.compute_count + var.infra_count + var.storage_count
   worker_mtu          = var.openshift_worker_mtu
   ntp_server          = var.openshift_ntp_server
 }

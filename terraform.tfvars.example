@@ -43,6 +43,9 @@ vm_network = "vdpg-192.168.100"
 // Additionally, IPAM will assign IPs based on the network ID. 
 machine_cidr = "192.168.100.0/24"
 
+// OpenShift Network type to use within OpenShift - OpenShiftSDN or OVNKubernetes
+openshift_networktype = "OpenShiftSDN"
+
 // The number of control plane VMs to create. Default is 3.
 control_plane_count = 3
 
