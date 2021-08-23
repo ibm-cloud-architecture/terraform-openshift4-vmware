@@ -291,6 +291,10 @@ variable openshift_network_type {
   default = "OpenShiftSDN"
 }
 
+variable "cluster_networktype" {
+  type = string
+}
+
 variable "openshift_cluster_cidr" {
   type    = string
   default = "10.128.0.0/14"
