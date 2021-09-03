@@ -249,3 +249,27 @@ variable "openshift_ntp_server" {
   type    = string
   default = ""
 }
+
+variable "proxy_config" {
+  type = map(string)
+  default = {
+    enabled    = false
+    httpProxy  = "http://user:password@ip:port"
+    httpsProxy = "http://user:password@ip:port"
+    noProxy    = "ip1,ip2,ip3,.example.com,cidr/mask"
+  }
+}
+
+variable "openshift_additional_trust_bundle" {
+  description = "path to a file with all your additional ca certificates"
+  type        = string
+  default     = ""
+}
+
+variable "airgapped" {
+  type = map(string)
+  default = {
+    enabled    = false
+    repository = ""
+  }
+}
