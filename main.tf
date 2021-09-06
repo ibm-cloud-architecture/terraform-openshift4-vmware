@@ -100,7 +100,6 @@ module "ignition" {
   cluster_cidr        = var.openshift_cluster_cidr
   cluster_hostprefix  = var.openshift_host_prefix
   cluster_servicecidr = var.openshift_service_cidr
-  cluster_networktype = var.openshift_network_type
   machine_cidr        = var.machine_cidr
   vsphere_server      = var.vsphere_server
   vsphere_username    = var.vsphere_user

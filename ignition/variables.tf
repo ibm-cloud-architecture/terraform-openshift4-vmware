@@ -18,10 +18,6 @@ variable "cluster_servicecidr" {
   type = string
 }
 
-variable "cluster_networktype" {
-  type = string
-}
-
 variable "machine_cidr" {
   type = string
 }
