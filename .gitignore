@@ -13,6 +13,7 @@
 
 # openshift pull-secret
 pull-secret.txt
+.pull_secret
 
 # local
 makefile
@@ -20,3 +21,4 @@ makefile
 **/terraform.tfstate.d/*
 **/installer/*
 .terraform.lock.hcl
+settings.json
