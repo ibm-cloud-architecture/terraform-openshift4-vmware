@@ -117,6 +117,9 @@ module "ignition" {
   total_node_count    = var.compute_count + var.infra_count + var.storage_count
   worker_mtu          = var.openshift_worker_mtu
   ntp_server          = var.openshift_ntp_server
+  airgapped           = var.airgapped
+  proxy_config        = var.proxy_config
+  trust_bundle        = var.openshift_additional_trust_bundle
 }
 
 module "bootstrap" {

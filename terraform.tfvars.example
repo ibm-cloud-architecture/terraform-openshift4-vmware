@@ -127,4 +127,46 @@ openshift_ingress_virtualip = "192.168.100.200"
 // openshift_worker_mtu = 9000
 
 // Set NTP server
-// openshift_ntp_server = "vistime.rtp.raleigh.ibm.com"
+// openshift_ntp_serevr = vistime.rtp.raleigh.ibm.com
+
+// AirGapped Configuration
+// Set enabled to true to configure your cluster for airgap install
+// set repository to the hostname:port of your image registry
+// NOTE:
+//  The registry has to be running on an SSL/TLS secured port.
+//  If the registry certificate uses a certificate signed by a a certificate authority
+//   which RHCOS does not trust by default copy the certificate authority certificate
+//   locally and update the openshift_additional_trust_bundle variable
+// https://docs.openshift.com/container-platform/4.7/installing/installing_vsphere/installing-restricted-networks-installer-provisioned-vsphere.html#installation-creating-image-restricted_installing-restricted-networks-installer-provisioned-vsphere
+// https://github.com/openshift/installer/blob/master/docs/user/customization.md#image-content-sources
+// airgapped = {
+//   enabled    = true
+//   repository = "myrepository.example.com:8443"
+// }
+
+// Proxy Configuration
+// Set enabled to true to configure your cluster-wide proxy at install time
+// https://github.com/openshift/installer/blob/master/docs/user/customization.md#proxy
+// proxy_config = {
+//   enabled    = true
+//   httpProxy  = "http://user:pass@proxy:port"
+//   httpsProxy = "http://user:pass@proxy:port"
+//   noProxy    = "ip1, ip2, ip3, .example.com, cidr/mask"
+// }
+// NOTE:
+//  If the proxy uses a customCA to do traffic inspection,
+//  (also known as man-in-the-middle proxy)
+//  copy the customCA certificate locally and update the
+//  openshift_additional_trust_bundle variable
+
+// Custom CA certificate
+// NOTE:
+//   If any component in your cluster will communicate to services
+//   secured by SSL/TLS certificates signed by a certificate authority
+//   which RHCOS does not trust by default copy the certificate authority certificate
+//   locally and update this variable.
+//
+//   The certificate MUST have the CA:TRUE basicContstain extension set.
+// https://github.com/openshift/installer/blob/master/docs/user/customization.md#additional-trust-bundle
+// openshift_additional_trust_bundle = "/path/to/customCA.crt"
+

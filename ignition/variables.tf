@@ -121,3 +121,26 @@ variable "create_openshift_vips" {
   type    = bool
   default = true
 }
+
+variable "proxy_config" {
+  type = map(string)
+  default = {
+    enabled    = false
+    httpProxy  = ""
+    httpsProxy = ""
+    noProxy    = ""
+  }
+}
+
+variable "trust_bundle" {
+  type    = string
+  default = ""
+}
+
+variable "airgapped" {
+  type = map(string)
+  default = {
+    enabled    = false
+    repository = ""
+  }
+}

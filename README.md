@@ -27,7 +27,7 @@ git clone https://github.com/ibm-cloud-architecture/terraform-openshift4-vmware
 cd terraform-openshift4-vmware
 ```
 
-Update your `terraform.tfvars` with your environment values.  See `terraform.tfvars.example`
+Update your `terraform.tfvars` with your environment values.  See sample `terraform.tfvars.example` file for details
 
 ```bash
 terraform init
@@ -105,3 +105,6 @@ rm -rf installer
 | ssh_public_key                   | Path to your ssh public key.  If left blank we will generate one. | string | - |
 | openshift_worker_mtu | Set the NIC MTU value of your worker nodes | number | 1450 |
 | openshift_ntp_server | Set the default NTP server | string | - |
+| airgapped | Configuration for an AirGapped environment | see sample tfvars file | map |
+| proxy_config | Configuration for Cluster wide proxy | see sample tfvars file | map |
+| openshift_additional_trust_bundle | Path to file containing custom certificate authority | - | string |

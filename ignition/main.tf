@@ -45,6 +45,22 @@ platform:
 %{if var.create_openshift_vips != false}publish: External%{endif}
 pullSecret: '${chomp(file(var.pull_secret))}'
 sshKey: '${var.ssh_public_key}'
+%{if var.airgapped["enabled"]}imageContentSources:
+- mirrors:
+  - ${var.airgapped["repository"]}
+  source: quay.io/openshift-release-dev/ocp-release
+- mirrors:
+  - ${var.airgapped["repository"]}
+  source: quay.io/openshift-release-dev/ocp-v4.0-art-dev
+%{endif}
+%{if var.proxy_config["enabled"]}proxy:
+  httpProxy: ${var.proxy_config["httpProxy"]}
+  httpsProxy: ${var.proxy_config["httpsProxy"]}
+  noProxy: ${var.proxy_config["noProxy"]}
+%{endif}
+%{if var.trust_bundle != ""}
+${indent(2, "additionalTrustBundle: |\n${file(var.trust_bundle)}")}
+%{endif}
 EOF
 }
 
