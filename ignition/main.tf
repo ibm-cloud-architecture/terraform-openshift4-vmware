@@ -98,7 +98,7 @@ spec:
   osImageURL: ''
   config:
     ignition:
-      version: 3.1.0
+      version: 3.2.0
     storage:
       files:
       - filesystem: root
@@ -147,7 +147,7 @@ spec:
       security:
         tls: {}
       timeouts: {}
-      version: 3.1.0
+      version: 3.2.0
     networkd: {}
     passwd: {}
     storage:
@@ -176,7 +176,7 @@ spec:
       security:
         tls: {}
       timeouts: {}
-      version: 3.1.0
+      version: 3.2.0
     networkd: {}
     passwd: {}
     storage:
