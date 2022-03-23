@@ -1,3 +1,7 @@
+locals {
+  minor_version = split("-", split(".", var.openshift_version)[1])[0]
+}
+
 data "template_file" "install_config" {
   template = <<EOF
 apiVersion: v1
@@ -77,6 +81,12 @@ spec:
     name: ""
 status: {}
 EOF
+}
+
+data "template_file" "post_deployment_04" {
+  template = templatefile("${path.module}/templates/99_04-post-deployment.yaml", {
+    CRB_API_VERSION = local.minor_version > 8 ? "v1" : "v1beta1"
+  })
 }
 
 data "template_file" "post_deployment_05" {
@@ -239,7 +249,6 @@ rm ${local.installerdir}/openshift/99_openshift-cluster-api_worker-machineset*
 cp ${path.module}/templates/99_01-post-deployment.yaml ${local.installerdir}/manifests
 cp ${path.module}/templates/99_02-post-deployment.yaml ${local.installerdir}/manifests
 cp ${path.module}/templates/99_03-post-deployment.yaml ${local.installerdir}/manifests
-cp ${path.module}/templates/99_04-post-deployment.yaml ${local.installerdir}/manifests
 EOF
   }
   depends_on = [
@@ -250,6 +259,14 @@ EOF
 resource "local_file" "cluster_scheduler" {
   content  = data.template_file.cluster_scheduler.rendered
   filename = "${local.installerdir}/manifests/cluster-scheduler-02-config.yml"
+  depends_on = [
+    null_resource.generate_manifests,
+  ]
+}
+
+resource "local_file" "post_deployment_04" {
+  content  = data.template_file.post_deployment_04.rendered
+  filename = "${local.installerdir}/manifests/99_04-post-deployment.yaml"
   depends_on = [
     null_resource.generate_manifests,
   ]
