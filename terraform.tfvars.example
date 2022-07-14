@@ -1,6 +1,14 @@
 // ID identifying the cluster to create. Use your username so that resources created can be tracked back to you.
 cluster_id = "upi46"
 
+// if set to true and vsphere_resource_pool not set then it will use the cluster default resource pool
+vsphere_preexisting_resourcepool = true
+//vsphere_resource_pool = "ocp46"
+
+// uncomment if the folder already exists in VMware
+// vsphere_preexisting_folder = true
+vsphere_folder = "ocp4
+
 // Base domain from which the cluster domain is a subdomain.
 base_domain = "ncolon.xyz"
 
@@ -51,14 +59,39 @@ bootstrap_ip_address = "192.168.100.80"
 // must match the value of control_plane_count.
 control_plane_ip_addresses = ["192.168.100.81", "192.168.100.82", "192.168.100.83"]
 
+// control_plane vm resources
+control_plane_name = "control-plane"
+control_plane_memory = "16384"
+control_plane_num_cpus = "4"
+control_plane_disk_size = 120
+
 // The IP addresses to assign to the compute VMs. The length of this list must
 // match the value of compute_count.
 compute_ip_addresses = ["192.168.100.84", "192.168.100.85", "192.168.100.86"]
 
+// compute vm resources
+compute_name = "compute"
+compute_memory = "8192"
+compute_num_cpus = "2"
+compute_disk_size = 120
+
+// The number of infra VMs to create. Default is 0. Set to 0 or 3
+// infra_count = 0
+
+// The IP addresses to assign to the infra VMs. The length of this list must
+// match the value of infra_count.
+//infra_ip_addresses = ["192.168.100.94", "192.168.100.95", "192.168.100.96"]
+
+// infra vm resources
+//infra_name = "infra"
+//infra_memory = "16384"
+//infra_num_cpus = "4"
+//infra_disk_size = 120
+
 // The IP addresses of your DNS servers for your OpenShift nodes
 vm_dns_addresses = ["9.42.106.2", "9.42.106.3"]
 
-// The IP address of the default gateway.  If not set, it will use the frist host of the machine_cidr range.
+// The IP address of the default gateway.  If not set, it will use the first host of the machine_cidr range.
 // vm_gateway = "192.168.100.254"
 
 // Path to your OpenShift Pull Secret
@@ -76,10 +109,16 @@ openshift_ingress_virtualip = "192.168.100.200"
 // The number of storage VMs to create. Default is 0.  Set to 0 or 3
 // storage_count = 3
 
-
 // The IP addresses to assign to the storage VMs. The length of this list must
 // match the value of storage_count.
 //storage_ip_addresses = ["192.168.100.87", "192.168.100.88", "192.168.100.89"]
+
+// storage vm resources
+//storage_name = "storage"
+//storage_memory = "32768"
+//storage_num_cpus = "16"
+//storage_disk_size = 120
+//storage_additional_disk_size = 500
 
 // Set MTU for worker VMs
 // openshift_worker_mtu = 9000

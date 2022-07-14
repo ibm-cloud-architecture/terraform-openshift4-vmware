@@ -59,20 +59,34 @@ terraform apply
 | bootstrap_ip_address             | IP Address for bootstrap node                                | string | - |
 | control_plane_ip_addresses       | List of IP addresses for your control plane nodes            | list   | - |
 | control_plane_count              | Number of control plane VMs to create                        | string | 3 |
+| control_plane_name               | VM and hostname of control plane                             | string | control_plane |
 | control_plane_memory             | Memory, in MB, to allocate to control plane VMs              | string | 16384 |
 | control_plane_num_cpus           | Number of CPUs to allocate for control plane VMs             | string | 4 |
 | control_plane_disk_size          | Disk Size, in GB, to allocate for control plane VMs          | number | 120 |
+| control_plane_extra_disk_size    | Extra Disk Size, in GB, to allocate for control plane VMs    | number | - |
 | compute_ip_addresses             | List of IP addresses for your compute nodes                  | list   | - |
-| compute_count                    | Number of compute VMs to create                              | string | 3|
+| compute_count                    | Number of compute VMs to create                              | string | 3 |
+| compute_name                     | VM and hostname of compute nodes                             | string | compute |
 | compute_memory                   | Memory, in MB, to allocate to compute VMs                    | string | 8192 |
-| compute_num_cpus                 | Number of CPUs to allocate for compute VMs                   | string | 3 |
-| compute_disk_size                | Disk Size, in GB, to allocate for compute VMs                | number | 60 |
-| storage_ip_addresses             | List of IP addresses for your storage nodes                   | list | `Empty` |
-| storage_count                    | Number of storage VMs to create                               | string | 0 |
+| compute_num_cpus                 | Number of CPUs to allocate for compute VMs                   | string | 2 |
+| compute_disk_size                | Disk Size, in GB, to allocate for compute VMs                | number | 120 |
+| compute_extra_disk_size          | Extra Disk Size, in GB, to allocate for compute VMs          | number | - |
+| infra_ip_addresses               | List of IP addresses for your infra nodes                    | list   | `Empty` |
+| infra_count                      | Number of infra VMs to create                                | string | 0 |
+| infra_name                       | VM and hostname of infra nodes                               | string | infra |
+| infra_memory                     | Memory, in MB, to allocate to infra VMs                      | string | 16384 |
+| infra_num_cpus                   | Number of CPUs to allocate for infra VMs                     | string | 4 |
+| infra_disk_size                  | Disk Size, in GB, to allocate for infra VMs                | number | 120 |
+| infra_extra_disk_size            | Extra Disk Size, in GB, to allocate for infra VMs          | number | - |
+| storage_ip_addresses             | List of IP addresses for your storage nodes                  | list | `Empty` |
+| storage_count                    | Number of storage VMs to create                              | string | 0 |
+| storage_name                     | VM and hostname of storage nodes                             | string | storage |
 | storage_memory                   | Memory, in MB to allocate to storage VMs                     | string | 65536 |
 | storage_num_cpus                 | Number of CPUs to allocate for storage VMs                   | string | 16 |
 | storage_disk_size                | Disk Size, in GB, to allocate for storage VMs                | number | 120 |
-| openshift_pull_secret            | Path to your OpenShift [pull secret](https://cloud.redhat.com/openshift/install/vsphere/user-provisioned) | string | -                |
+| storage_extra_disk_size          | Disk Size, in GB, to allocate for storage VMs                | number | - |
+| storage_additional_disk_size     | Disk Size, in GB, to allocate for storage VMs (e.g. OCS)     | number | - |
+| openshift_pull_secret            | Path to your OpenShift [pull secret](https://cloud.redhat.com/openshift/install/vsphere/user-provisioned) | string | - |
 | openshift_cluster_cidr           | CIDR for pods in the OpenShift SDN                           | string | 10.128.0.0/14 |
 | openshift_service_cidr           | CIDR for services in the OpenShift SDN                       | string | 172.30.0.0/16 |
 | openshift_host_prefix            | Controls the number of pods to allocate to each node from the `openshift_cluster_cidr` CIDR. For example, 23 would allocate 2^(32-23) 512 pods to each node. | string | 23 |

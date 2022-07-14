@@ -55,6 +55,29 @@ variable "vm_gateway" {
   default     = null
 }
 
+variable "vsphere_preexisting_folder" {
+  type        = bool
+  description = "If false, creates a top-level folder with the name from vsphere_folder_rel_path."
+  default     = false
+}
+
+variable "vsphere_folder" {
+  type        = string
+  description = "The relative path to the folder which should be used or created for VMs."
+  default     = ""
+}
+
+variable "vsphere_preexisting_resourcepool" {
+  description = "If false, creates a resource pool for OpenShift nodes."
+  default     = false
+}
+
+variable "vsphere_resource_pool" {
+  type        = string
+  description = "The resource pool that should be used or created for VMs"
+  default     = ""
+}
+
 /////////
 // OpenShift cluster variables
 /////////
@@ -94,6 +117,12 @@ variable "control_plane_ip_addresses" {
   type    = list(string)
   default = []
 }
+
+variable "control_plane_name" {
+  type    = string
+  default = "control-plane"
+}
+
 variable "control_plane_memory" {
   type    = string
   default = "16384"
@@ -106,13 +135,17 @@ variable "control_plane_num_cpus" {
 
 variable "control_plane_disk_size" {
   type    = number
-  default = 60
+  default = 120
+}
+
+variable "control_plane_extra_disk_size" {
+  type    = number
+  default = 0 
 }
 
 //////////
 // compute machine variables
 //////////
-
 
 variable "compute_count" {
   type    = string
@@ -124,6 +157,11 @@ variable "compute_ip_addresses" {
   default = []
 }
 
+variable "compute_name" {
+  type    = string
+  default = "compute"
+}
+
 variable "compute_memory" {
   type    = string
   default = "8192"
@@ -131,12 +169,56 @@ variable "compute_memory" {
 
 variable "compute_num_cpus" {
   type    = string
-  default = "4"
+  default = "2"
 }
 
 variable "compute_disk_size" {
   type    = number
-  default = 60
+  default = 120
+}
+
+variable "compute_extra_disk_size" {
+  type    = number
+  default = 0 
+}
+
+//////////
+// infra machine variables
+//////////
+
+variable "infra_count" {
+  type    = string
+  default = "0"
+}
+
+variable "infra_ip_addresses" {
+  type    = list(string)
+  default = []
+}
+
+variable "infra_name" {
+  type    = string
+  default = "infra"
+}
+
+variable "infra_memory" {
+  type    = string
+  default = "8192"
+}
+
+variable "infra_num_cpus" {
+  type    = string
+  default = "2"
+}
+
+variable "infra_disk_size" {
+  type    = number
+  default = 120
+}
+
+variable "infra_extra_disk_size" {
+  type    = number
+  default = 0 
 }
 
 //////////
@@ -153,6 +235,11 @@ variable "storage_ip_addresses" {
   default = []
 }
 
+variable "storage_name" {
+  type    = string
+  default = "storage"
+}
+
 variable "storage_memory" {
   type    = string
   default = "65536"
@@ -166,6 +253,16 @@ variable "storage_num_cpus" {
 variable "storage_disk_size" {
   type    = number
   default = 120
+}
+
+variable "storage_extra_disk_size" {
+  type    = number
+  default = 0 
+}
+
+variable "storage_additional_disk_size" {
+  type    = number
+  default = 0 
 }
 
 variable "openshift_api_virtualip" {
@@ -200,7 +297,7 @@ variable "openshift_host_prefix" {
 variable "openshift_version" {
   type        = string
   description = "Specify the OpenShift version you want to deploy.  Must be 4.6 or later to use this automation"
-  default     = "4.6.16"
+  default     = "4.6"
 }
 
 variable "create_openshift_vips" {
@@ -213,29 +310,6 @@ variable "create_openshift_vips" {
 variable "ssh_public_key" {
   type        = string
   description = "Path to your ssh public key.  If left blank we will generate one."
-  default     = ""
-}
-
-variable "vsphere_preexisting_folder" {
-  type        = bool
-  description = "If false, creates a top-level folder with the name from vsphere_folder_rel_path."
-  default     = false
-}
-
-variable "vsphere_folder" {
-  type        = string
-  description = "The relative path to the folder which should be used or created for VMs."
-  default     = ""
-}
-
-variable "vsphere_preexisting_resourcepool" {
-  description = "If false, creates a resource pool for OpenShift nodes."
-  default     = false
-}
-
-variable "vsphere_resource_pool" {
-  type        = string
-  description = "The resource pool that should be used or created for VMs"
   default     = ""
 }
 

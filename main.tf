@@ -5,13 +5,15 @@
 
 locals {
   cluster_domain      = "${var.cluster_id}.${var.base_domain}"
-  bootstrap_fqdns     = ["bootstrap-0.${local.cluster_domain}"]
-  control_plane_fqdns = [for idx in range(var.control_plane_count) : "control-plane-${idx}.${local.cluster_domain}"]
-  compute_fqdns       = [for idx in range(var.compute_count) : "compute-${idx}.${local.cluster_domain}"]
-  storage_fqdns       = [for idx in range(var.storage_count) : "storage-${idx}.${local.cluster_domain}"]
+  bootstrap_fqdns     = ["bootstrap.${local.cluster_domain}"]
+  control_plane_fqdns = [for idx in range(var.control_plane_count) : "${var.control_plane_name}-${idx}.${local.cluster_domain}"]
+  compute_fqdns       = [for idx in range(var.compute_count) : "${var.compute_name}-${idx}.${local.cluster_domain}"]
+  infra_fqdns         = [for idx in range(var.infra_count) : "${var.infra_name}-${idx}.${local.cluster_domain}"] 
+  storage_fqdns       = [for idx in range(var.storage_count) : "${var.storage_name}-${idx}.${local.cluster_domain}"]
   ssh_public_key      = var.ssh_public_key == "" ? chomp(tls_private_key.installkey[0].public_key_openssh) : chomp(file(pathexpand(var.ssh_public_key)))
   folder_path         = var.vsphere_folder == "" ? var.cluster_id : var.vsphere_folder
-  resource_pool_id    = var.vsphere_preexisting_resourcepool ? data.vsphere_resource_pool.resource_pool[0].id : vsphere_resource_pool.resource_pool[0].id
+//  resource_pool_id    = var.vsphere_preexisting_resourcepool ? data.vsphere_resource_pool.resource_pool[0].id : vsphere_resource_pool.resource_pool[0].id
+  resource_pool_id    = var.vsphere_preexisting_resourcepool ? var.vsphere_resource_pool == "" ? data.vsphere_compute_cluster.compute_cluster.resource_pool_id : data.vsphere_resource_pool.resource_pool[0].id : vsphere_resource_pool.resource_pool[0].id
 }
 
 provider "vsphere" {
@@ -53,7 +55,7 @@ resource "vsphere_resource_pool" "resource_pool" {
 }
 
 data "vsphere_resource_pool" "resource_pool" {
-  count = var.vsphere_preexisting_resourcepool ? 1 : 0
+  count = var.vsphere_preexisting_resourcepool && var.vsphere_resource_pool != "" ? 1 : 0
 
   name          = var.vsphere_resource_pool
   datacenter_id = data.vsphere_datacenter.dc.id
@@ -141,9 +143,9 @@ module "bootstrap" {
   cluster_domain = local.cluster_domain
   machine_cidr   = var.machine_cidr
 
-  num_cpus      = 2
-  memory        = 8192
-  disk_size     = 60
+  num_cpus      = 4
+  memory        = 16384
+  disk_size     = 120
   dns_addresses = var.vm_dns_addresses
   vm_gateway    = var.vm_gateway == null ? cidrhost(var.machine_cidr, 1) : var.vm_gateway
 }
@@ -170,11 +172,12 @@ module "control_plane_vm" {
   cluster_domain = local.cluster_domain
   machine_cidr   = var.machine_cidr
 
-  num_cpus      = var.control_plane_num_cpus
-  memory        = var.control_plane_memory
-  disk_size     = var.control_plane_disk_size
-  dns_addresses = var.vm_dns_addresses
-  vm_gateway    = var.vm_gateway == null ? cidrhost(var.machine_cidr, 1) : var.vm_gateway
+  num_cpus        = var.control_plane_num_cpus
+  memory          = var.control_plane_memory
+  disk_size       = var.control_plane_disk_size
+  extra_disk_size = var.control_plane_extra_disk_size
+  dns_addresses   = var.vm_dns_addresses
+  vm_gateway      = var.vm_gateway == null ? cidrhost(var.machine_cidr, 1) : var.vm_gateway
 }
 
 module "compute_vm" {
@@ -199,11 +202,42 @@ module "compute_vm" {
   cluster_domain = local.cluster_domain
   machine_cidr   = var.machine_cidr
 
-  num_cpus      = var.compute_num_cpus
-  memory        = var.compute_memory
-  disk_size     = var.compute_disk_size
-  dns_addresses = var.vm_dns_addresses
-  vm_gateway    = var.vm_gateway == null ? cidrhost(var.machine_cidr, 1) : var.vm_gateway
+  num_cpus        = var.compute_num_cpus
+  memory          = var.compute_memory
+  disk_size       = var.compute_disk_size
+  extra_disk_size = var.compute_extra_disk_size
+  dns_addresses   = var.vm_dns_addresses
+  vm_gateway      = var.vm_gateway == null ? cidrhost(var.machine_cidr, 1) : var.vm_gateway
+}
+
+module "infra_vm" {
+  source = "./vm"
+
+  hostnames_ip_addresses = zipmap(
+    local.infra_fqdns,
+    var.infra_ip_addresses
+  )
+
+  ignition = module.ignition.worker_ignition
+
+  resource_pool_id      = local.resource_pool_id
+  datastore_id          = data.vsphere_datastore.datastore.id
+  datacenter_id         = data.vsphere_datacenter.dc.id
+  network_id            = data.vsphere_network.network.id
+  folder_id             = local.folder_path
+  guest_id              = data.vsphere_virtual_machine.template.guest_id
+  template_uuid         = data.vsphere_virtual_machine.template.id
+  disk_thin_provisioned = data.vsphere_virtual_machine.template.disks[0].thin_provisioned
+
+  cluster_domain = local.cluster_domain
+  machine_cidr   = var.machine_cidr
+
+  num_cpus        = var.infra_num_cpus
+  memory          = var.infra_memory
+  disk_size       = var.infra_disk_size
+  extra_disk_size = var.infra_extra_disk_size
+  dns_addresses   = var.vm_dns_addresses
+  vm_gateway      = var.vm_gateway == null ? cidrhost(var.machine_cidr, 1) : var.vm_gateway
 }
 
 module "storage_vm" {
@@ -228,10 +262,12 @@ module "storage_vm" {
   cluster_domain = local.cluster_domain
   machine_cidr   = var.machine_cidr
 
-  num_cpus      = var.storage_num_cpus
-  memory        = var.storage_memory
-  disk_size     = var.storage_disk_size
-  dns_addresses = var.vm_dns_addresses
-  vm_gateway    = var.vm_gateway == null ? cidrhost(var.machine_cidr, 1) : var.vm_gateway
+  num_cpus          = var.storage_num_cpus
+  memory            = var.storage_memory
+  disk_size         = var.storage_disk_size
+  extra_disk_size   = var.storage_extra_disk_size
+  storage_disk_size = var.storage_additional_disk_size
+  dns_addresses     = var.vm_dns_addresses
+  vm_gateway        = var.vm_gateway == null ? cidrhost(var.machine_cidr, 1) : var.vm_gateway
 }
 
