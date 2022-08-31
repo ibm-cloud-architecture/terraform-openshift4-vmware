@@ -230,13 +230,13 @@ variable "vsphere_folder" {
 
 variable "vsphere_preexisting_resourcepool" {
   description = "If false, creates a resource pool for OpenShift nodes."
-  default     = false
+  default     = true
 }
 
 variable "vsphere_resource_pool" {
   type        = string
   description = "The resource pool that should be used or created for VMs"
-  default     = ""
+  default     = "ocp/Resources"
 }
 
 variable "openshift_worker_mtu" {
