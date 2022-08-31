@@ -62,7 +62,7 @@ vm_dns_addresses = ["192.168.10.2"]
 vm_gateway = "192.168.10.1"
 
 // Path to your OpenShift Pull Secret
-openshift_pull_secret = "~/.pull-secret"
+openshift_pull_secret = ""
 
 // Set to true (default) so that OpenShift self-hosts its own LoadBalancers (similar to IPI deployments)
 // If set to false, you must bring your own LoadBalancers and point the api enpoint to masters and apps endpoint to workers
