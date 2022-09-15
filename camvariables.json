@@ -1,0 +1,218 @@
+{
+    "terraform_version": ">= 0.13",
+
+    "input_datatypes": [],
+
+    "input_groups": [
+        {
+            "name": "vSphere",
+            "label": "vSphere Input Variables"
+        },
+        {
+            "name": "OpenShift",
+            "label": "OpenShift Input Variables"
+        }
+    ],
+
+    "output_groups": [],
+    "template_input_params": [
+
+        {
+            "name": "vsphere_server",
+            "type": "string",
+            "description": "This is the vSphere server for the environment.",
+            "default": "",
+            "hidden": false,
+            "label": "vsphere_server",
+            "secured": false,
+            "required": true,
+            "immutable": false,
+            "group_name": "vSphere",
+            "regexdesc": ""
+        },
+
+        {
+            "name": "vsphere_user",
+            "type": "string",
+            "description": "vSphere server user for the environment.",
+            "default": "",
+            "hidden": false,
+            "label": "vsphere_user",
+            "secured": false,
+            "required": true,
+            "immutable": false,
+            "group_name": "vSphere",
+            "regexdesc": ""
+        },
+
+        {
+            "name": "vsphere_password",
+            "type": "string",
+            "description": "vSphere server password",
+            "default": "",
+            "hidden": false,
+            "label": "vsphere_password",
+            "secured": false,
+            "required": true,
+            "immutable": false,
+            "group_name": "vSphere",
+            "regexdesc": ""
+        },
+
+        {
+            "name": "vsphere_cluster",
+            "type": "string",
+            "description": "This is the name of the vSphere cluster.",
+            "default": "",
+            "hidden": false,
+            "label": "vsphere_cluster",
+            "secured": false,
+            "required": true,
+            "immutable": false,
+            "group_name": "vSphere",
+            "regexdesc": ""
+        },
+
+        {
+            "name": "vsphere_datacenter",
+            "type": "string",
+            "description": "This is the name of the vSphere data center.",
+            "default": "",
+            "hidden": false,
+            "label": "vsphere_datacenter",
+            "secured": false,
+            "required": true,
+            "immutable": false,
+            "group_name": "vSphere",
+            "regexdesc": ""
+        },
+
+        {
+            "name": "vsphere_datastore",
+            "type": "string",
+            "description": "This is the name of the vSphere data store.",
+            "default": "",
+            "hidden": false,
+            "label": "vsphere_datastore",
+            "secured": false,
+            "required": true,
+            "immutable": false,
+            "group_name": "vSphere",
+            "regexdesc": ""
+        },
+
+        {
+            "name": "vm_template",
+            "type": "string",
+            "description": "This is the name of the VM template to clone.",
+            "default": "",
+            "hidden": false,
+            "label": "vm_template",
+            "secured": false,
+            "required": true,
+            "immutable": false,
+            "group_name": "vSphere",
+            "regexdesc": ""
+        },
+
+        {
+            "name": "vm_network",
+            "type": "string",
+            "description": "This is the name of the publicly accessible network for cluster ingress and access.",
+            "default": "VM Network",
+            "hidden": false,
+            "label": "vm_network",
+            "secured": false,
+            "required": true,
+            "immutable": false,
+            "group_name": "vSphere",
+            "regexdesc": ""
+        },
+
+        {
+            "name": "vm_dns_addresses",
+            "type": "list",
+            "description": "List of DNS servers to use for your OpenShift Nodes",
+            "default": [
+                "192.168.1.2",
+                "192.168.1.2"
+            ]
+            "hidden": false,
+            "label": "vm_dns_addresses",
+            "secured": false,
+            "required": true,
+            "immutable": false,
+            "group_name": "cloud",
+            "regexdesc": ""
+        },
+
+        {
+            "name": "",
+            "type": "string",
+            "description": "",
+            "default": "",
+            "hidden": false,
+            "label": "",
+            "secured": false,
+            "required": true,
+            "immutable": false,
+            "group_name": "cloud",
+            "regexdesc": ""
+        },
+
+        {
+            "name": "",
+            "type": "string",
+            "description": "",
+            "default": "",
+            "hidden": false,
+            "label": "",
+            "secured": false,
+            "required": true,
+            "immutable": false,
+            "group_name": "cloud",
+            "regexdesc": ""
+        },
+
+
+
+        {
+            "name": "openshift_pull_secret",
+            "type": "string",
+            "description": "Provide a Red Hat pullsecret",
+            "default": "",
+            "hidden": false,
+            "label": "Red Hat pullsecret",
+            "secured": false,
+            "required": true,
+            "immutable": false,
+            "group_name": "cloud",
+            "regexdesc": ""
+        },
+        {
+
+        }
+    ],
+    "template_output_params": [
+        {
+            "name": "azure_vm_public_ip",
+            "label": "azure_vm_public_ip",
+            "description": "null",
+            "group_name": "",
+            "secured": false,
+            "hidden": false,
+            "shortname": "",
+            "type": "string"
+        },
+        {
+            "name": "azure_vm_private_ip",
+            "label": "azure_vm_private_ip",
+            "description": "null",
+            "group_name": "",
+            "secured": false,
+            "hidden": false,
+            "shortname": "",
+            "type": "string"
+        }
+    ]
+
