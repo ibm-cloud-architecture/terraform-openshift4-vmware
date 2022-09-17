@@ -113,6 +113,11 @@ variable "ntp_server" {
   default = ""
 }
 
+variable "create_openshift_vips" {
+  type    = bool
+  default = true
+}
+
 variable "proxy_config" {
   type = map(string)
   default = {

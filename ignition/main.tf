@@ -46,6 +46,7 @@ platform:
 %{if var.vsphere_folder != ""}    folder: /${var.vsphere_datacenter}/vm/${var.vsphere_folder}%{endif}
 %{if var.api_vip != ""}    apiVIP: ${var.api_vip}%{endif}
 %{if var.ingress_vip != ""}    ingressVIP: ${var.ingress_vip}%{endif}
+%{if var.create_openshift_vips != false}publish: External%{endif}
 pullSecret: '${chomp(file(var.pull_secret))}'
 sshKey: '${var.ssh_public_key}'
 %{if var.airgapped["enabled"]}imageContentSources:
@@ -123,7 +124,7 @@ spec:
   osImageURL: ''
   config:
     ignition:
-      version: 3.1.0
+      version: 3.2.0
     storage:
       files:
       - filesystem: root
@@ -172,7 +173,7 @@ spec:
       security:
         tls: {}
       timeouts: {}
-      version: 3.1.0
+      version: 3.2.0
     networkd: {}
     passwd: {}
     storage:
@@ -201,7 +202,7 @@ spec:
       security:
         tls: {}
       timeouts: {}
-      version: 3.1.0
+      version: 3.2.0
     networkd: {}
     passwd: {}
     storage:
@@ -225,7 +226,7 @@ resource "null_resource" "download_binaries" {
 set -ex
 test -e ${local.installerdir} || mkdir -p ${local.installerdir}
 if [[ $(uname -s) == "Darwin" ]]; then PLATFORM="mac"; else PLATFORM="linux"; fi
-curl -o ${local.installerdir}/openshift-installer.tar.gz https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/${var.openshift_version}/openshift-install-$PLATFORM.tar.gz
+curl -o ${local.installerdir}/openshift-installer.tar.gz https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/stable-${var.openshift_version}/openshift-install-$PLATFORM.tar.gz
 tar -xf ${local.installerdir}/openshift-installer.tar.gz -C ${local.installerdir}
 EOF
   }
@@ -245,7 +246,8 @@ resource "null_resource" "generate_manifests" {
 set -ex
 ${local.installerdir}/openshift-install --dir=${local.installerdir}/ create manifests --log-level debug
 rm ${local.installerdir}/openshift/99_openshift-cluster-api_master-machines*
-rm ${local.installerdir}/openshift/99_openshift-cluster-api_worker-machineset*
+# Copy worker-machineset as it makes it easier to apply a new worker after the cluster has been built
+cp ${local.installerdir}/openshift/99_openshift-cluster-api_worker-machineset* ${local.installerdir}
 cp ${path.module}/templates/99_01-post-deployment.yaml ${local.installerdir}/manifests
 cp ${path.module}/templates/99_02-post-deployment.yaml ${local.installerdir}/manifests
 cp ${path.module}/templates/99_03-post-deployment.yaml ${local.installerdir}/manifests
@@ -325,7 +327,6 @@ resource "null_resource" "generate_ignition" {
     local_file.post_deployment_06
   ]
 }
-
 
 data "local_file" "bootstrap_ignition" {
   filename = "${local.installerdir}/bootstrap.ign"
