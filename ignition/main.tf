@@ -315,6 +315,21 @@ resource "local_file" "ntp_workers" {
   ]
 }
 
+data "local_file" "kubeadmin_password_file" {
+  filename = "${local.installerdir}/auth/kubeadmin-password"
+  depends_on = [
+    null_resource.generate_manifests
+  ]
+}
+
+data "local_file" "kubeconfig_file" {
+  filename = "${local.installerdir}/auth/kubeconfig"
+  depends_on = [
+    null_resource.generate_manifests
+  ]
+}
+
+
 resource "null_resource" "generate_ignition" {
   provisioner "local-exec" {
     command = "${local.installerdir}/openshift-install --dir=${local.installerdir}/ create ignition-configs --log-level debug"
