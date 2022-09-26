@@ -24,7 +24,7 @@
             "label": "OpenShift Output Variables"
         }
     ],
-    
+
     "template_input_params": [
 
         {
@@ -716,7 +716,7 @@
             "immutable": false,
             "group_name": "OpenShift",
             "regexdesc": ""
-        },
+        }
 
     ],
 
