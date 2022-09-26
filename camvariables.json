@@ -14,7 +14,16 @@
         }
     ],
 
-    "output_groups": [],
+    "output_groups": [
+        {
+            "name": "vSphere",
+            "label": "vSphere Output Variables"
+        },
+        {
+            "name": "OpenShift_output",
+            "label": "OpenShift Output Variables"
+        }
+    ],
     "template_input_params": [
 
         {
@@ -149,8 +158,7 @@
         {
             "name": "vm_gateway",
             "type": "string",
-            "description": "IP Address to use for VM default gateway.  If not set, default is the first host in the CIDR range
-            ull",
+            "description": "IP Address to use for VM default gateway.  If not set, default is the first host in the CIDR range",
             "default": "192.168.10.1",
             "hidden": false,
             "label": "vm_gateway",
@@ -169,7 +177,7 @@
             "hidden": false,
             "label": "cluster_id",
             "secured": false,
-            "required": true,
+            "required": false,
             "immutable": false,
             "group_name": "OpenShift",
             "regexdesc": ""
@@ -708,24 +716,45 @@
     ],
     "template_output_params": [
         {
-            "name": "azure_vm_public_ip",
-            "label": "azure_vm_public_ip",
+            "name": "worker_ignition",
+            "label": "worker_ignition",
             "description": "null",
-            "group_name": "",
+            "group_name": "OpenShift_output",
             "secured": false,
             "hidden": false,
             "shortname": "",
             "type": "string"
         },
         {
-            "name": "azure_vm_private_ip",
-            "label": "azure_vm_private_ip",
+            "name": "master_ignition",
+            "label": "master_ignition",
             "description": "null",
-            "group_name": "",
+            "group_name": "OpenShift_output",
             "secured": false,
             "hidden": false,
             "shortname": "",
             "type": "string"
-        }
+        },
+        {
+            "name": "kubeadmin_password_file",
+            "label": "Console Password for kubeadmin",
+            "description": "",
+            "group_name": "OpenShift_output",
+            "type": "string",
+            "secured": true,
+            "hidden": false,
+            "immutable": false
+          },
+          {
+            "name": "kubeconfig_file",
+            "label": "kubeconfig for kubeadmin",
+            "group_name": "OpenShift_output", 
+            "description": "",
+            "type": "string",
+            "secured": true,
+            "hidden": false,
+            "immutable": false
+          }  
+
     ]
 
