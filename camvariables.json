@@ -601,7 +601,7 @@
             "hidden": false,
             "label": "openshift_ntp_server",
             "secured": false,
-            "required": true,
+            "required": false,
             "immutable": false,
             "group_name": "OpenShift",
             "regexdesc": ""
@@ -632,7 +632,7 @@
             "hidden": false,
             "label": "openshift_additional_trust_bundle",
             "secured": false,
-            "required": true,
+            "required": false,
             "immutable": false,
             "group_name": "OpenShift",
             "regexdesc": ""
