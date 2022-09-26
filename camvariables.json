@@ -67,7 +67,7 @@
             "name": "vsphere_cluster",
             "type": "string",
             "description": "This is the name of the vSphere cluster.",
-            "default": "tfupi48",
+            "default": "ocp",
             "hidden": false,
             "label": "vsphere_cluster",
             "secured": false,
