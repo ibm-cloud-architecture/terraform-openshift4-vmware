@@ -133,8 +133,8 @@
             "type": "list",
             "description": "List of DNS servers to use for your OpenShift Nodes",
             "default": [
-                "192.168.1.2",
-                "192.168.1.2"
+                "192.168.10.2",
+                "192.168.10.2"
             ],
             "hidden": false,
             "label": "vm_dns_addresses",
