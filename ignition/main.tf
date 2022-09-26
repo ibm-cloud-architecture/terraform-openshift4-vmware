@@ -351,13 +351,13 @@ data "local_file" "worker_ignition" {
 data "local_file" "kubeadmin_password_file" {
   filename = "${local.installerdir}/auth/kubeadmin-password"
   depends_on = [
-    null_resource.generate_manifests
+    null_resource.generate_ignition
   ]
 }
 
 data "local_file" "kubeconfig_file" {
   filename = "${local.installerdir}/auth/kubeconfig"
   depends_on = [
-    null_resource.generate_manifests
+    null_resource.generate_ignition
   ]
 }
