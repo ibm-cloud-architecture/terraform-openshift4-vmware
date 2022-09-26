@@ -26,7 +26,6 @@
     ],
 
     "template_input_params": [
-
         {
             "name": "vsphere_server",
             "type": "string",
@@ -183,7 +182,6 @@
             "group_name": "OpenShift",
             "regexdesc": ""
         },
-
 
         {
             "name": "base_domain",
@@ -717,7 +715,6 @@
             "group_name": "OpenShift",
             "regexdesc": ""
         }
-
     ],
 
     "template_output_params": [
