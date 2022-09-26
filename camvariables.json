@@ -13,7 +13,6 @@
             "label": "OpenShift Input Variables"
         }
     ],
-
     "output_groups": [
         {
             "name": "vSphere",
@@ -24,7 +23,6 @@
             "label": "OpenShift Output Variables"
         }
     ],
-
     "template_input_params": [
         {
             "name": "vsphere_server",
@@ -39,7 +37,6 @@
             "group_name": "vSphere",
             "regexdesc": ""
         },
-
         {
             "name": "vsphere_user",
             "type": "string",
@@ -53,7 +50,6 @@
             "group_name": "vSphere",
             "regexdesc": ""
         },
-
         {
             "name": "vsphere_password",
             "type": "string",
@@ -67,7 +63,6 @@
             "group_name": "vSphere",
             "regexdesc": ""
         },
-
         {
             "name": "vsphere_cluster",
             "type": "string",
@@ -81,7 +76,6 @@
             "group_name": "vSphere",
             "regexdesc": ""
         },
-
         {
             "name": "vsphere_datacenter",
             "type": "string",
@@ -95,7 +89,6 @@
             "group_name": "vSphere",
             "regexdesc": ""
         },
-
         {
             "name": "vsphere_datastore",
             "type": "string",
@@ -109,7 +102,6 @@
             "group_name": "vSphere",
             "regexdesc": ""
         },
-
         {
             "name": "vm_template",
             "type": "string",
@@ -123,7 +115,6 @@
             "group_name": "vSphere",
             "regexdesc": ""
         },
-
         {
             "name": "vm_network",
             "type": "string",
@@ -137,7 +128,6 @@
             "group_name": "vSphere",
             "regexdesc": ""
         },
-
         {
             "name": "vm_dns_addresses",
             "type": "list",
@@ -154,7 +144,6 @@
             "group_name": "vSphere",
             "regexdesc": ""
         },
-
         {
             "name": "vm_gateway",
             "type": "string",
@@ -168,7 +157,6 @@
             "group_name": "vSphere",
             "regexdesc": ""
         },
-
         {
             "name": "cluster_id",
             "type": "string",
@@ -182,7 +170,6 @@
             "group_name": "OpenShift",
             "regexdesc": ""
         },
-
         {
             "name": "base_domain",
             "type": "string",
@@ -196,7 +183,6 @@
             "group_name": "OpenShift",
             "regexdesc": ""
         },
-
         {
             "name": "machine_cidr",
             "type": "string",
@@ -210,7 +196,6 @@
             "group_name": "OpenShift",
             "regexdesc": ""
         },
-
         {
             "name": "bootstrap_ip_address",
             "type": "string",
@@ -224,7 +209,6 @@
             "group_name": "OpenShift",
             "regexdesc": ""
         },
-
         {
             "name": "control_plane_count",
             "type": "string",
@@ -238,7 +222,6 @@
             "group_name": "OpenShift",
             "regexdesc": ""
         },
-
         {
             "name": "control_plane_ip_addresses",
             "type": "List",
@@ -256,7 +239,6 @@
             "group_name": "OpenShift",
             "regexdesc": ""
         },
-
         {
             "name": "control_plane_memory",
             "type": "string",
@@ -270,7 +252,6 @@
             "group_name": "OpenShift",
             "regexdesc": ""
         },
-
         {
             "name": "control_plane_num_cpus",
             "type": "string",
@@ -284,7 +265,6 @@
             "group_name": "OpenShift",
             "regexdesc": ""
         },
-
         {
             "name": "control_plane_disk_size",
             "type": "string",
@@ -298,7 +278,6 @@
             "group_name": "OpenShift",
             "regexdesc": ""
         },
-
         {
             "name": "compute_count",
             "type": "string",
@@ -312,7 +291,6 @@
             "group_name": "OpenShift",
             "regexdesc": ""
         },
-
         {
             "name": "compute_ip_addresses",
             "type": "list",
@@ -329,7 +307,6 @@
             "group_name": "OpenShift",
             "regexdesc": ""
         },
-
         {
             "name": "compute_memory",
             "type": "string",
@@ -343,7 +320,6 @@
             "group_name": "OpenShift",
             "regexdesc": ""
         },
-
         {
             "name": "compute_num_cpus",
             "type": "string",
@@ -357,7 +333,6 @@
             "group_name": "OpenShift",
             "regexdesc": ""
         },
-
         {
             "name": "compute_disk_size",
             "type": "string",
@@ -371,7 +346,6 @@
             "group_name": "OpenShift",
             "regexdesc": ""
         },
-
         {
             "name": "storage_count",
             "type": "string",
@@ -385,7 +359,6 @@
             "group_name": "OpenShift",
             "regexdesc": ""
         },
-
         {
             "name": "storage_ip_addresses",
             "type": "list",
@@ -399,7 +372,6 @@
             "group_name": "OpenShift",
             "regexdesc": ""
         },
-
         {
             "name": "storage_memory",
             "type": "string",
@@ -413,7 +385,6 @@
             "group_name": "OpenShift",
             "regexdesc": ""
         },
-
         {
             "name": "storage_num_cpus",
             "type": "string",
@@ -427,7 +398,6 @@
             "group_name": "OpenShift",
             "regexdesc": ""
         },
-
         {
             "name": "storage_disk_size",
             "type": "string",
@@ -441,7 +411,6 @@
             "group_name": "OpenShift",
             "regexdesc": ""
         },
-
         {
             "name": "openshift_api_virtualip",
             "type": "string",
@@ -455,7 +424,6 @@
             "group_name": "OpenShift",
             "regexdesc": ""
         },
-
         {
             "name": "openshift_ingress_virtualip",
             "type": "string",
@@ -469,7 +437,6 @@
             "group_name": "OpenShift",
             "regexdesc": ""
         },
-
         {
             "name": "openshift_pull_secret",
             "type": "string",
@@ -483,7 +450,6 @@
             "group_name": "OpenShift",
             "regexdesc": ""
         },
-
         {
             "name": "openshift_cluster_cidr",
             "type": "string",
@@ -497,7 +463,6 @@
             "group_name": "OpenShift",
             "regexdesc": ""
         },
-
         {
             "name": "openshift_service_cidr",
             "type": "string",
@@ -511,7 +476,6 @@
             "group_name": "OpenShift",
             "regexdesc": ""
         },
-
         {
             "name": "openshift_host_prefix",
             "type": "string",
@@ -525,7 +489,6 @@
             "group_name": "OpenShift",
             "regexdesc": ""
         },
-
         {
             "name": "openshift_version",
             "type": "string",
@@ -539,7 +502,6 @@
             "group_name": "OpenShift",
             "regexdesc": ""
         },
-
         {
             "name": "create_openshift_vips",
             "type": "boolean",
@@ -553,21 +515,19 @@
             "group_name": "OpenShift",
             "regexdesc": ""
         },
-
         {
             "name": "ssh_public_key",
             "type": "string",
             "description": " WILL NOT WORK Path to your ssh public key.  If left blank we will generate one.",
             "default": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAID4lpGr2UuXaAPhk3jHGfWy1ex+Bzm6codScAGGn8GN7 root@cdautil.cda.internal",
             "hidden": false,
-            "label": "",
+            "label": "ssh_public_key",
             "secured": false,
             "required": true,
             "immutable": false,
             "group_name": "OpenShift",
             "regexdesc": ""
         },
-
         {
             "name": "vsphere_preexisting_folder",
             "type": "boolean",
@@ -581,12 +541,11 @@
             "group_name": "OpenShift",
             "regexdesc": ""
         },
-
         {
             "name": "vsphere_folder",
             "type": "string",
             "description": "The relative path to the folder which should be used or created for VMs.",
-            "default": "",
+            "default": "/Datacenter/vm/tfupi48",
             "hidden": false,
             "label": "vsphere_folder",
             "secured": false,
@@ -595,7 +554,6 @@
             "group_name": "OpenShift",
             "regexdesc": ""
         },
-
         {
             "name": "vsphere_preexisting_resourcepool",
             "type": "boolean",
@@ -609,7 +567,6 @@
             "group_name": "OpenShift",
             "regexdesc": ""
         },
-
         {
             "name": "vsphere_resource_pool",
             "type": "string",
@@ -623,7 +580,6 @@
             "group_name": "OpenShift",
             "regexdesc": ""
         },
-
         {
             "name": "openshift_worker_mtu",
             "type": "string",
@@ -637,7 +593,6 @@
             "group_name": "OpenShift",
             "regexdesc": ""
         },
-
         {
             "name": "openshift_ntp_server",
             "type": "string",
@@ -651,7 +606,6 @@
             "group_name": "OpenShift",
             "regexdesc": ""
         },
-
         {
             "name": "proxy_config",
             "type": "map",
@@ -670,7 +624,6 @@
             "group_name": "OpenShift",
             "regexdesc": ""
         },
-
         {
             "name": "openshift_additional_trust_bundle",
             "type": "string",
@@ -684,7 +637,6 @@
             "group_name": "OpenShift",
             "regexdesc": ""
         },
-
         {
             "name": "airgapped",
             "type": "map",
@@ -695,20 +647,6 @@
             },
             "hidden": false,
             "label": "airgapped",
-            "secured": false,
-            "required": true,
-            "immutable": false,
-            "group_name": "OpenShift",
-            "regexdesc": ""
-        },
-
-        {
-            "name": "",
-            "type": "string",
-            "description": "",
-            "default": "",
-            "hidden": false,
-            "label": "",
             "secured": false,
             "required": true,
             "immutable": false,
