@@ -648,7 +648,7 @@
             "hidden": false,
             "label": "airgapped",
             "secured": false,
-            "required": true,
+            "required": false,
             "immutable": false,
             "group_name": "OpenShift",
             "regexdesc": ""
