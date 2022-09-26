@@ -24,6 +24,7 @@
             "label": "OpenShift Output Variables"
         }
     ],
+    
     "template_input_params": [
 
         {
@@ -717,10 +718,8 @@
             "regexdesc": ""
         },
 
-        {
-
-        }
     ],
+
     "template_output_params": [
         {
             "name": "worker_ignition",
