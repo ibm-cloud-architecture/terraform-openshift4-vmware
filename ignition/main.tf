@@ -46,7 +46,7 @@ platform:
 %{if var.vsphere_folder != ""}    folder: /${var.vsphere_datacenter}/vm/${var.vsphere_folder}%{endif}
 %{if var.api_vip != ""}    apiVIP: ${var.api_vip}%{endif}
 %{if var.ingress_vip != ""}    ingressVIP: ${var.ingress_vip}%{endif}
-pullSecret: '${chomp(file(var.pull_secret))}'
+pullSecret: '${chomp(var.pull_secret)}'
 sshKey: '${var.ssh_public_key}'
 %{if var.airgapped["enabled"]}imageContentSources:
 - mirrors:
@@ -348,3 +348,16 @@ data "local_file" "worker_ignition" {
   ]
 }
 
+data "local_file" "kubeadmin_password_file" {
+  filename = "${local.installerdir}/auth/kubeadmin-password"
+  depends_on = [
+    null_resource.generate_ignition
+  ]
+}
+
+data "local_file" "kubeconfig_file" {
+  filename = "${local.installerdir}/auth/kubeconfig"
+  depends_on = [
+    null_resource.generate_ignition
+  ]
+}

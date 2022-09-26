@@ -13,3 +13,10 @@ output "master_ignition" {
 output "worker_ignition" {
   value = data.local_file.worker_ignition.content
 }
+output "kubeadmin_password_file" {
+  value = data.local_file.kubeadmin_password_file.content
+}
+
+output "kubeconfig_file" {
+  value = data.local_file.kubeconfig_file.content
+}
