@@ -224,7 +224,7 @@
         },
         {
             "name": "control_plane_ip_addresses",
-            "type": "List",
+            "type": "list",
             "description": "",
             "default": [
                 "192.168.10.21",
