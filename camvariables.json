@@ -282,7 +282,7 @@
             "name": "compute_count",
             "type": "string",
             "description": "",
-            "default": "3",
+            "default": "2",
             "hidden": false,
             "label": "compute_count",
             "secured": false,
