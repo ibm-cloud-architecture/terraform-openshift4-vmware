@@ -110,7 +110,7 @@ data "template_file" "mtu_script" {
   })
 }
 
-data "template_file" "mtu_machineconfig" {
+data "template_file" "mtu_machineconfig_worker" {
   template = <<EOF
 kind: MachineConfig
 apiVersion: machineconfiguration.openshift.io/v1
@@ -150,6 +150,45 @@ spec:
 EOF
 }
 
+data "template_file" "mtu_machineconfig_master" {
+  template = <<EOF
+kind: MachineConfig
+apiVersion: machineconfiguration.openshift.io/v1
+metadata:
+  name: 99-master-mtu
+  creationTimestamp: 
+  labels:
+    machineconfiguration.openshift.io/role: master
+spec:
+  osImageURL: ''
+  config:
+    ignition:
+      version: 3.1.0
+    storage:
+      files:
+      - filesystem: root
+        path: "/etc/NetworkManager/dispatcher.d/30-mtu"
+        contents:
+          source: data:text/plain;charset=utf-8;base64,${base64encode(data.template_file.mtu_script.rendered)}
+          verification: {}
+        mode: 0755
+    systemd:
+      units:
+        - contents: |
+            [Unit]
+            Requires=systemd-udevd.target
+            After=systemd-udevd.target
+            Before=NetworkManager.service
+            DefaultDependencies=no
+            [Service]
+            Type=oneshot
+            ExecStart=/usr/sbin/restorecon /etc/NetworkManager/dispatcher.d/30-mtu
+            [Install]
+            WantedBy=multi-user.target
+          name: one-shot-mtu.service
+          enabled: true
+EOF
+}
 
 data "template_file" "chrony_config" {
   template = templatefile("${path.module}/templates/chrony.conf", {
@@ -288,9 +327,18 @@ resource "local_file" "post_deployment_06" {
   ]
 }
 
-resource "local_file" "mtu_configuration" {
+resource "local_file" "mtu_configuration_masters" {
   count    = var.worker_mtu == 1500 ? 0 : 1
-  content  = data.template_file.mtu_machineconfig.rendered
+  content  = data.template_file.mtu_machineconfig_master.rendered
+  filename = "${local.installerdir}/manifests/99_master_mtu-machineconfig.yaml"
+  depends_on = [
+    null_resource.generate_manifests,
+  ]
+}
+
+resource "local_file" "mtu_configuration_workers" {
+  count    = var.worker_mtu == 1500 ? 0 : 1
+  content  = data.template_file.mtu_machineconfig_worker.rendered
   filename = "${local.installerdir}/manifests/99_worker_mtu-machineconfig.yaml"
   depends_on = [
     null_resource.generate_manifests,
@@ -299,7 +347,7 @@ resource "local_file" "mtu_configuration" {
 
 resource "local_file" "ntp_masters" {
   count    = var.ntp_server == "" ? 0 : 1
-  content  = data.template_file.mtu_machineconfig.rendered
+  content  = data.template_file.chrony_config_masters.rendered
   filename = "${local.installerdir}/manifests/99_master_ntp-machineconfig.yaml"
   depends_on = [
     null_resource.generate_manifests,
@@ -308,7 +356,7 @@ resource "local_file" "ntp_masters" {
 
 resource "local_file" "ntp_workers" {
   count    = var.ntp_server == "" ? 0 : 1
-  content  = data.template_file.mtu_machineconfig.rendered
+  content  = data.template_file.chrony_config_workers.rendered
   filename = "${local.installerdir}/manifests/99_worker_ntp-machineconfig.yaml"
   depends_on = [
     null_resource.generate_manifests,
@@ -322,7 +370,11 @@ resource "null_resource" "generate_ignition" {
   depends_on = [
     local_file.cluster_scheduler,
     local_file.post_deployment_05,
-    local_file.post_deployment_06
+    local_file.post_deployment_06,
+    local_file.mtu_configuration_masters,
+    local_file.mtu_configuration_workers,
+    local_file.ntp_masters,
+    local_file.ntp_workers
   ]
 }
 
