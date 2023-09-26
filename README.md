@@ -73,6 +73,7 @@ terraform apply
 | storage_num_cpus                 | Number of CPUs to allocate for storage VMs                   | string | 16 |
 | storage_disk_size                | Disk Size, in GB, to allocate for storage VMs                | number | 120 |
 | openshift_pull_secret            | Path to your OpenShift [pull secret](https://cloud.redhat.com/openshift/install/vsphere/user-provisioned) | string | -                |
+| openshift_sdn                    | OpenShift SDN to use.  Use `OVNKubernetes` for 4.12 and later| string | OpenShiftSDN |
 | openshift_cluster_cidr           | CIDR for pods in the OpenShift SDN                           | string | 10.128.0.0/14 |
 | openshift_service_cidr           | CIDR for services in the OpenShift SDN                       | string | 172.30.0.0/16 |
 | openshift_host_prefix            | Controls the number of pods to allocate to each node from the `openshift_cluster_cidr` CIDR. For example, 23 would allocate 2^(32-23) 512 pods to each node. | string | 23 |

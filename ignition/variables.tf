@@ -14,6 +14,10 @@ variable "cluster_id" {
   type = string
 }
 
+variable "clsuter_sdn" {
+  type = string
+}
+
 variable "cluster_servicecidr" {
   type = string
 }

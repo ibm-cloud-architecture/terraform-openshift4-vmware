@@ -31,7 +31,7 @@ networking:
     hostPrefix: ${var.cluster_hostprefix}
   machineNetwork:
   - cidr: ${var.machine_cidr}
-  networkType: OpenShiftSDN
+  networkType: ${var.cluster_sdn}
   serviceNetwork:
   - ${var.cluster_servicecidr}
 platform:
