@@ -14,7 +14,7 @@ variable "cluster_id" {
   type = string
 }
 
-variable "clsuter_sdn" {
+variable "cluster_sdn" {
   type = string
 }
 
